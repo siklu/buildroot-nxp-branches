@@ -3,11 +3,104 @@
 # Starts dropbear sshd.
 #
 
+# special for Siklu
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/sw/lib
+
 # Allow a few customizations from a config file
 test -r /etc/default/dropbear && . /etc/default/dropbear
 
+mkdir -p /var/log
+
+
+if [[ -L "/etc/dropbear" && -d "/etc/dropbear" ]]
+then
+    echo "/etc/dropbear is a symlink to a directory, remove it"
+    rm /etc/dropbear
+fi
+mkdir -p /etc/dropbear
+
+
+if ! test -e /var/log/lastlog; then touch /var/log/lastlog; fi 
+
+KEYGEN=dropbearkey
+ECDSA_KEY=/etc/dropbear/dropbear_ecdsa_host_key
+RSA_KEY=/etc/dropbear/dropbear_rsa_host_key
+DSS_KEY=/etc/dropbear/dropbear_dss_host_key
+
+banner_file="/tmp/ssh_banner"
+banner_file_in_web_resources="/tmp/web_resources/ssh_banner"
+
+
+
+do_ecdsa_keygen() {
+    if [ ! -s $ECDSA_KEY ] || [ ! -e $ECDSA_KEY ]; then
+	rm -f $ECDSA_KEY
+        echo -n "Generating dropbear ECDSA host key: "
+        if $KEYGEN -t ecdsa -f $ECDSA_KEY >&/dev/null; then
+            chmod 600 $ECDSA_KEY
+            echo "ECDSA key generation success"
+            echo
+        else
+            echo "**** ECDSA key generation fail****"
+            echo
+            exit 1
+        fi
+    fi
+}
+
+do_rsa_keygen() {
+    if [ ! -s $RSA_KEY ] || [ ! -e $RSA_KEY ]; then
+	rm -f $RSA_KEY
+        echo -n "Generating dropbear RSA host key: "
+        if $KEYGEN -t rsa -f $RSA_KEY >&/dev/null; then
+            chmod 600 $RSA_KEY
+            echo "RSA key generation success"
+            echo
+        else
+            echo "**** RSA key generation fail ****"
+            echo
+            exit 1
+        fi
+    fi
+}
+
+do_dss_keygen() {
+    if [ ! -s $DSS_KEY ] || [ ! -e $DSS_KEY ]; then
+	rm -f $DSS_KEY
+        echo -n "Generating dropbear DSS host key: "
+        if $KEYGEN -t dss -f $DSS_KEY >&/dev/null; then
+            chmod 600 $DSS_KEY
+            echo "DSS key generation success"
+            echo
+        else
+            echo "**** DSS key generation fail ****"
+            echo
+            exit 1
+        fi
+    fi
+}
+
+do_ssh_banner()
+{
+	if [ -e ${banner_file_in_web_resources} ]
+	then
+		echo "Use predefined SSH banner"
+		cp ${banner_file_in_web_resources} ${banner_file}
+	else
+		echo "Generate SSH banner"
+		/home/sw/bin/sys_util -b
+	fi
+}
+
+
 start() {
-	DROPBEAR_ARGS="$DROPBEAR_ARGS -R"
+	  DROPBEAR_ARGS="$DROPBEAR_ARGS -R -k -j -K 10 -I 0 -b /tmp/ssh_banner"
+
+	  do_ecdsa_keygen
+	  do_rsa_keygen
+	  do_dss_keygen
+	  do_ssh_banner
+
 
 	# If /etc/dropbear is a symlink to /var/run/dropbear, and
 	#   - the filesystem is RO (i.e. we can not rm the symlink),
