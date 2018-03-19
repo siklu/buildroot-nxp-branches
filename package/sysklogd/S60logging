@@ -4,7 +4,6 @@ case "$1" in
 	start)
 		printf "Starting logging: "
 		/sbin/syslogd -m 0
-		/sbin/klogd
 		echo "OK"
 		;;
 	stop)
