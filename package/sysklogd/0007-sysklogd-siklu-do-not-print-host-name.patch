@@ -1,0 +1,11 @@
+diff -uNr -x '*~' sysklogd-1.5.1.orig/syslogd.c sysklogd-1.5.1.new/syslogd.c
+--- sysklogd-1.5.1.orig/syslogd.c	2018-02-11 15:40:14.000000000 +0200
++++ sysklogd-1.5.1.new/syslogd.c	2018-03-22 21:04:28.000000000 +0200
+@@ -1621,6 +1621,7 @@
+ #endif
+ #endif
+ 
++	from = ""; // siklu 22.3.2018 - do not print hostname in syslog files
+ 	dprintf("logmsg: %s, flags %x, from %s, msg %s\n", textpri(pri), flags, from, msg);
+ 
+ #ifdef __gnu_linux__

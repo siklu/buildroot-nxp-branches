@@ -2,6 +2,11 @@
 #
 # sysklogd
 #
+#	22/03/2018    Siklu changes:
+#		prevent put host name in syslog file. Instead call to function gethostname() initialize LocalHostName string by " "
+#		generated patch sysklogd-siklu.patch
+#		by command:   diff -uNr  sysklogd-1.5.1.orig sysklogd-1.5.1.new -x *~ > 0007-sysklogd-siklu-do-not-print-host-name.patch
+#
 ################################################################################
 
 SYSKLOGD_VERSION = 1.5.1
