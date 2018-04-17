@@ -52,6 +52,8 @@ define DROPBEAR_FIX_MAKEFILE
 	#$(SED) 's,scpmisc.o compat.o,scpmisc.o compat.o siklu_dropbear.o,g' $(@D)/Makefile
 endef
 
+DROPBEAR_DEPENDENCIES += zlib linux-pam
+
 DROPBEAR_POST_CONFIGURE_HOOKS = DROPBEAR_FIX_MAKEFILE
 
 
