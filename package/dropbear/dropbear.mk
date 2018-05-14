@@ -11,15 +11,22 @@
 #
 #	Check that dropbear's Makefile has line:
 #		LIBS+=-lutil -lz -lpam 
+#
+#	before generate patch file - clean all files except *.h and *.c:
+#		find . -not -name "*.c" -not -name "*.h"|xargs rm -rf
 ################################################################################
 
-# - siklu replaced by same MRV version
+# - siklu replaced by same MRV version. Siklu uses in all projects version 2016.74
+#	latest buildroot version 2017.75 
+#	13 may 2018 move to version 2018.76
+# DROPBEAR_VERSION = 2016.74
 # DROPBEAR_VERSION = 2017.75  
-DROPBEAR_VERSION = 2016.74
+DROPBEAR_VERSION = 2018.76
 
 
 
-DROPBEAR_SITE = http://matt.ucc.asn.au/dropbear/releases
+#DROPBEAR_SITE = http://matt.ucc.asn.au/dropbear/releases
+DROPBEAR_SITE = https://matt.ucc.asn.au/dropbear/releases
 DROPBEAR_SOURCE = dropbear-$(DROPBEAR_VERSION).tar.bz2
 DROPBEAR_LICENSE = MIT, BSD-2-Clause-like, BSD-2-Clause
 DROPBEAR_LICENSE_FILES = LICENSE
@@ -112,6 +119,10 @@ endif
 ifneq ($(BR2_PACKAGE_DROPBEAR_LASTLOG),y)
 DROPBEAR_CONF_OPTS += --disable-lastlog
 endif
+
+# siklu - enable PAM support
+DROPBEAR_CONF_OPTS += --enable-pam  --quiet
+
 
 define DROPBEAR_INSTALL_TARGET_CMDS
 	$(INSTALL) -m 755 $(@D)/dropbearmulti $(TARGET_DIR)/usr/sbin/dropbear
