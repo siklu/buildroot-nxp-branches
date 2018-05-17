@@ -1,0 +1,105 @@
+--- netsnmp-5.4.2.1_orig/agent/agent_trap.c.orig	2012-09-09 10:02:47.446695951 +0300
++++ netsnmp-5.4.2.1_new/agent/agent_trap.c	2012-09-09 12:43:33.886695990 +0300
+@@ -61,6 +61,10 @@
+ #include <net-snmp/agent/agent_trap.h>
+ #include <net-snmp/agent/snmp_agent.h>
+ #include <net-snmp/agent/agent_callbacks.h>
++#include <net-snmp/agent/agent_handler.h>
++#include <net-snmp/library/snmp_api.h>
++#include <net-snmp/library/snmp_client.h>
++#include <net-snmp/library/fd_event_manager.h>
+ 
+ #include <net-snmp/agent/agent_module_config.h>
+ #include <net-snmp/agent/mib_module_config.h>
+@@ -74,6 +78,7 @@
+     struct trap_sink *next;
+     int             pdutype;
+     int             version;
++	u_char			my_data[60];
+ };
+ 
+ struct trap_sink *sinks = NULL;
+@@ -138,6 +143,30 @@
+ 	 *
+ 	 *******************/
+ 
++
++
++
++int GetNumOfSinks( void)
++{
++    struct trap_sink *sink;
++	int numOf = 0;
++    for (sink = sinks; sink; sink = sink->next)
++		numOf ++;
++	return numOf;
++}
++
++
++void AddMyDataToLastSink( void * srcP, int srcLen)
++{
++	if(srcLen < sizeof(sinks->my_data))
++		memcpy( sinks->my_data, srcP, srcLen);
++}
++
++volatile int (* myBeforeSendTrapPtr)( void * my_data, netsnmp_session * sessionP, netsnmp_pdu *template_pdu) = NULL;
++
++volatile oid myEnterpriseOid[50];
++volatile int myEnterpriseOidLen = 0;
++
+ void
+ init_traps(void)
+ {
+@@ -640,6 +669,9 @@
+     u_long                 uptime;
+     struct trap_sink *sink;
+ 
++	enterprise = myEnterpriseOid;
++	enterprise_length = myEnterpriseOidLen;
++
+     DEBUGMSGTL(( "trap", "send_trap %d %d ", trap, specific));
+     DEBUGMSGOID(("trap", enterprise, enterprise_length));
+     DEBUGMSG(( "trap", "\n"));
+@@ -805,13 +837,25 @@
+ #ifndef NETSNMP_DISABLE_SNMPV1
+         if (sink->version == SNMP_VERSION_1) {
+           if (template_v1pdu) {
+-            send_trap_to_sess(sink->sesp, template_v1pdu);
++
++			int toDo = 1;
++			if(myBeforeSendTrapPtr != NULL)
++				toDo = myBeforeSendTrapPtr( sink->my_data, sink->sesp, template_v1pdu);
++
++			if(toDo != 0)
++            	send_trap_to_sess(sink->sesp, template_v1pdu);
+           }
+         } else {
+ #endif
+           if (template_v2pdu) {
+             template_v2pdu->command = sink->pdutype;
+-            send_trap_to_sess(sink->sesp, template_v2pdu);
++
++			int toDo = 1;
++			if(myBeforeSendTrapPtr != NULL)
++				toDo = myBeforeSendTrapPtr( sink->my_data, sink->sesp, template_v2pdu);
++
++			if(toDo != 0)
++	            send_trap_to_sess(sink->sesp, template_v2pdu);
+           }
+ #ifndef NETSNMP_DISABLE_SNMPV1
+         }
+--- netsnmp-5.4.2.1_orig/agent/snmpd.c.orig	2008-08-17 23:50:55.000000000 +0300
++++ netsnmp-5.4.2.1_new/agent/snmpd.c	2012-09-09 12:41:15.250695993 +0300
+@@ -431,6 +431,12 @@
+     FILE           *PID;
+ #endif
+ 
++    /* !!! DO NOT DELETE THE FOLLOWING 2 LINES !!! */ 
++    extern GetNumOfSinks(), AddMyDataToLastSink();
++    printf("%p %p %p %p %p %p %p %p\n", GetNumOfSinks, AddMyDataToLastSink,
++    		snmp_add_var, netsnmp_unregister_handler,
++    		snmp_unregister_callback, snmp_set_var_typed_integer,
++		register_readfd, unregister_readfd);
+ #ifndef WIN32
+     /*
+      * close all non-standard file descriptors we may have
