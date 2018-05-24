@@ -94,7 +94,8 @@ do_ssh_banner()
 
 
 start() {
-	  DROPBEAR_ARGS="$DROPBEAR_ARGS -R -k -j -K 10 -I 0 -b /tmp/ssh_banner"
+	  # DROPBEAR_ARGS="$DROPBEAR_ARGS -R -k -j -K 10 -I 0 -b /tmp/ssh_banner"
+	  DROPBEAR_ARGS="$DROPBEAR_ARGS -k -j -K 10 -I 0 -b /tmp/ssh_banner"
 
 	  do_ecdsa_keygen
 	  do_rsa_keygen
