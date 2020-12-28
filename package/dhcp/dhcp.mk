@@ -25,6 +25,8 @@ DHCP_CONF_OPTS = \
 	--with-relay-pid-file=/var/run/dhcrelay.pid \
 	--with-relay6-pid-file=/var/run/dhcrelay6.pid
 
+DHCP_CONF_OPTS += CFLAGS="$(TARGET_CFLAGS) -fcommon"
+
 # The source for the bind libraries used by dhcp are embedded in the dhcp source
 # as a tar-ball. Extract the bind source to allow any patches to be applied
 # during the patch phase.

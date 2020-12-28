@@ -17,6 +17,8 @@ RSYSLOG_PLUGINS = imdiag imfile impstats imptcp \
 RSYSLOG_CONF_OPTS = --disable-generate-man-pages \
 	$(foreach x,$(call qstrip,$(RSYSLOG_PLUGINS)),--enable-$(x))
 
+RSYSLOG_CONF_OPTS += CFLAGS="$(TARGET_CFLAGS) -fcommon"
+
 # Build after BusyBox
 ifeq ($(BR2_PACKAGE_BUSYBOX),y)
 RSYSLOG_DEPENDENCIES += busybox
