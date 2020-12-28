@@ -1,0 +1,40 @@
+From 292278c8620ed228dcc74eed7a83cc9553e47090 Mon Sep 17 00:00:00 2001
+From: Viacheslav Volkov <Viacheslav.Volkov@udelphi.com>
+Date: Wed, 23 Dec 2020 11:47:31 +0200
+Subject: [PATCH] Add missing #include <sys/sysmacros.h>
+
+This header is required to use functions makedev(), major() and minor() with new
+glibc.
+
+---
+ squashfs-tools/mksquashfs.c | 1 +
+ squashfs-tools/unsquashfs.c | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/squashfs-tools/mksquashfs.c b/squashfs-tools/mksquashfs.c
+index 13d60f7..71dd1d5 100644
+--- a/squashfs-tools/mksquashfs.c
++++ b/squashfs-tools/mksquashfs.c
+@@ -35,6 +35,7 @@
+ #include <stddef.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
++#include <sys/sysmacros.h>
+ #include <fcntl.h>
+ #include <errno.h>
+ #include <dirent.h>
+diff --git a/squashfs-tools/unsquashfs.c b/squashfs-tools/unsquashfs.c
+index 1323dd6..2633e0c 100644
+--- a/squashfs-tools/unsquashfs.c
++++ b/squashfs-tools/unsquashfs.c
+@@ -32,6 +32,7 @@
+ #include "stdarg.h"
+ 
+ #include <sys/sysinfo.h>
++#include <sys/sysmacros.h>
+ #include <sys/types.h>
+ #include <sys/time.h>
+ #include <sys/resource.h>
+-- 
+2.29.2
+
