@@ -1,0 +1,29 @@
+From 783affccefb47b2ab5458f6c6aee3ddb700835ef Mon Sep 17 00:00:00 2001
+From: Viacheslav Volkov <Viacheslav.Volkov@udelphi.com>
+Date: Tue, 22 Dec 2020 19:24:16 +0200
+Subject: [PATCH] Fix host-flex link error: undefined reference to reallocarray
+
+---
+ src/misc.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/misc.c b/src/misc.c
+index ef27833..dcf5a61 100644
+--- a/src/misc.c
++++ b/src/misc.c
+@@ -142,6 +142,12 @@ void add_action (const char *new_text)
+ void   *allocate_array (int size, size_t element_size)
+ {
+ 	void *mem;
++
++	/* Our target's toolchain has reallocarray, but host's doesn't. It looks
++	 * like during configuration we check target's toolchain and conclude
++	 * that we have reallocarray. */
++#undef HAVE_REALLOCARRAY
++
+ #if HAVE_REALLOCARRAY
+ 	/* reallocarray has built-in overflow detection */
+ 	mem = reallocarray(NULL, (size_t) size, element_size);
+-- 
+2.29.2
+
