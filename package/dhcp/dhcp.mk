@@ -5,7 +5,8 @@
 ################################################################################
 
 DHCP_VERSION = 4.3.5
-DHCP_SITE = http://ftp.isc.org/isc/dhcp/$(DHCP_VERSION)
+#DHCP_SITE = http://ftp.isc.org/isc/dhcp/$(DHCP_VERSION)
+DHCP_SITE = $(BR2_SIKLU_FTP_URL)
 DHCP_INSTALL_STAGING = YES
 DHCP_LICENSE = ISC
 DHCP_LICENSE_FILES = LICENSE

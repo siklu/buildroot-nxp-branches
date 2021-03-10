@@ -5,7 +5,8 @@
 ################################################################################
 
 LZOP_VERSION = 1.03
-LZOP_SITE = http://www.lzop.org/download
+#LZOP_SITE = http://www.lzop.org/download
+LZOP_SITE = $(BR2_SIKLU_FTP_URL)
 LZOP_LICENSE = GPL-2.0+
 LZOP_LICENSE_FILES = COPYING
 LZOP_DEPENDENCIES = lzo

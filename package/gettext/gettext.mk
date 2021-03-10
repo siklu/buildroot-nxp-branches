@@ -5,7 +5,8 @@
 ################################################################################
 
 GETTEXT_VERSION = 0.19.8.1
-GETTEXT_SITE = $(BR2_GNU_MIRROR)/gettext
+#GETTEXT_SITE = $(BR2_GNU_MIRROR)/gettext
+GETTEXT_SITE = $(BR2_SIKLU_FTP_URL)
 GETTEXT_SOURCE = gettext-$(GETTEXT_VERSION).tar.xz
 GETTEXT_INSTALL_STAGING = YES
 GETTEXT_LICENSE = LGPL-2.1+ (libintl), GPL-3.0+ (the rest)

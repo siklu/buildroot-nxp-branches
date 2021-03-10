@@ -5,7 +5,8 @@
 ################################################################################
 
 RSYSLOG_VERSION = 8.22.0
-RSYSLOG_SITE = http://rsyslog.com/files/download/rsyslog
+#RSYSLOG_SITE = http://rsyslog.com/files/download/rsyslog
+RSYSLOG_SITE = $(BR2_SIKLU_FTP_URL)
 RSYSLOG_LICENSE = GPL-3.0, LGPL-3.0, Apache-2.0
 RSYSLOG_LICENSE_FILES = COPYING COPYING.LESSER COPYING.ASL20
 RSYSLOG_DEPENDENCIES = zlib libestr liblogging libfastjson host-pkgconf

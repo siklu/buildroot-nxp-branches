@@ -5,7 +5,8 @@
 ################################################################################
 
 LIBLOGGING_VERSION = 1.0.5
-LIBLOGGING_SITE = http://download.rsyslog.com/liblogging
+#LIBLOGGING_SITE = http://download.rsyslog.com/liblogging
+LIBLOGGING_SITE = $(BR2_SIKLU_FTP_URL)
 LIBLOGGING_LICENSE = BSD-2-Clause
 LIBLOGGING_LICENSE_FILES = COPYING
 LIBLOGGING_INSTALL_STAGING = YES

@@ -6,7 +6,8 @@
 
 ZIP_VERSION = 30
 ZIP_SOURCE = zip$(ZIP_VERSION).tgz
-ZIP_SITE = ftp://ftp.info-zip.org/pub/infozip/src
+#ZIP_SITE = ftp://ftp.info-zip.org/pub/infozip/src
+ZIP_SITE = $(BR2_SIKLU_FTP_URL)
 ZIP_LICENSE = Info-ZIP
 ZIP_LICENSE_FILES = LICENSE
 

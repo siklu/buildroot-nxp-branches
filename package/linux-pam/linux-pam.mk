@@ -6,7 +6,8 @@
 
 LINUX_PAM_VERSION = 1.3.0
 LINUX_PAM_SOURCE = Linux-PAM-$(LINUX_PAM_VERSION).tar.bz2
-LINUX_PAM_SITE = http://linux-pam.org/library
+#LINUX_PAM_SITE = http://linux-pam.org/library
+LINUX_PAM_SITE = $(BR2_SIKLU_FTP_URL)
 LINUX_PAM_INSTALL_STAGING = YES
 LINUX_PAM_CONF_OPTS = \
 	--disable-prelude \

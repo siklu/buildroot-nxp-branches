@@ -6,7 +6,8 @@
 
 STRACE_VERSION = 4.18
 STRACE_SOURCE = strace-$(STRACE_VERSION).tar.xz
-STRACE_SITE = http://downloads.sourceforge.net/project/strace/strace/$(STRACE_VERSION)
+#STRACE_SITE = http://downloads.sourceforge.net/project/strace/strace/$(STRACE_VERSION)
+STRACE_SITE = $(BR2_SIKLU_FTP_URL)
 STRACE_LICENSE = BSD-3-Clause
 STRACE_LICENSE_FILES = COPYING
 

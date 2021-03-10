@@ -13,7 +13,8 @@ else
 LUA_VERSION = 5.1.5
 endif
 endif
-LUA_SITE = http://www.lua.org/ftp
+#LUA_SITE = http://www.lua.org/ftp
+LUA_SITE = $(BR2_SIKLU_FTP_URL)
 LUA_INSTALL_STAGING = YES
 LUA_LICENSE = MIT
 ifeq ($(BR2_PACKAGE_LUA_5_1),y)

@@ -21,7 +21,8 @@
 # Siklu uses follow version:
 NETSNMP_VERSION = 5.4.2.1
 
-NETSNMP_SITE = http://downloads.sourceforge.net/project/net-snmp/net-snmp/$(NETSNMP_VERSION)
+#NETSNMP_SITE = http://downloads.sourceforge.net/project/net-snmp/net-snmp/$(NETSNMP_VERSION)
+NETSNMP_SITE = $(BR2_SIKLU_FTP_URL)
 NETSNMP_SOURCE = net-snmp-$(NETSNMP_VERSION).tar.gz
 NETSNMP_LICENSE = Various BSD-like
 NETSNMP_LICENSE_FILES = COPYING

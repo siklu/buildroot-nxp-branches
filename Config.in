@@ -281,6 +281,12 @@ config BR2_GNU_MIRROR
 	     http://ftp.gnu.org/pub/gnu
 	     http://mirror.aarnet.edu.au/pub/gnu
 
+config BR2_SIKLU_FTP_URL
+	string "SIKLU FTP URL"
+	default "ftp://swro:%42%33%59%3e%24%78%39@ftp.siklu.com/EH8010/buildroot"
+	help
+	  Defining the Siklu FTP URL.
+
 config BR2_LUAROCKS_MIRROR
 	string "LuaRocks mirror"
 	default "http://rocks.moonscript.org"

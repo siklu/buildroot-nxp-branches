@@ -5,7 +5,8 @@
 ################################################################################
 
 LIBFASTJSON_VERSION = v0.99.4
-LIBFASTJSON_SITE = $(call github,rsyslog,libfastjson,$(LIBFASTJSON_VERSION))
+#LIBFASTJSON_SITE = $(call github,rsyslog,libfastjson,$(LIBFASTJSON_VERSION))
+LIBFASTJSON_SITE = $(BR2_SIKLU_FTP_URL)
 LIBFASTJSON_INSTALL_STAGING = YES
 # From git
 LIBFASTJSON_AUTORECONF = YES

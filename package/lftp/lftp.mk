@@ -6,7 +6,8 @@
 
 LFTP_VERSION = 4.8.0
 LFTP_SOURCE = lftp-$(LFTP_VERSION).tar.xz
-LFTP_SITE = http://lftp.yar.ru/ftp
+#LFTP_SITE = http://lftp.yar.ru/ftp
+LFTP_SITE = $(BR2_SIKLU_FTP_URL)
 LFTP_LICENSE = GPL-3.0+
 LFTP_LICENSE_FILES = COPYING
 # Needed so that our libtool patch applies properly, and for patch

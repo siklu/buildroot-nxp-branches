@@ -6,7 +6,8 @@
 
 ATTR_VERSION = 2.4.47
 ATTR_SOURCE = attr-$(ATTR_VERSION).src.tar.gz
-ATTR_SITE = http://download.savannah.gnu.org/releases/attr
+#ATTR_SITE = http://download.savannah.gnu.org/releases/attr
+ATTR_SITE = $(BR2_SIKLU_FTP_URL)
 ATTR_INSTALL_STAGING = YES
 ATTR_CONF_OPTS = --enable-gettext=no
 HOST_ATTR_CONF_OPTS = --enable-gettext=no

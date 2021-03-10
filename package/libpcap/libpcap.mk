@@ -5,7 +5,8 @@
 ################################################################################
 
 LIBPCAP_VERSION = 1.8.1
-LIBPCAP_SITE = http://www.tcpdump.org/release
+#LIBPCAP_SITE = http://www.tcpdump.org/release
+LIBPCAP_SITE = $(BR2_SIKLU_FTP_URL)
 LIBPCAP_LICENSE = BSD-3-Clause
 LIBPCAP_LICENSE_FILES = LICENSE
 LIBPCAP_INSTALL_STAGING = YES

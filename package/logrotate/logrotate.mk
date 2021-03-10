@@ -5,7 +5,8 @@
 ################################################################################
 
 LOGROTATE_VERSION = 3.11.0
-LOGROTATE_SITE = $(call github,logrotate,logrotate,$(LOGROTATE_VERSION))
+#LOGROTATE_SITE = $(call github,logrotate,logrotate,$(LOGROTATE_VERSION))
+LOGROTATE_SITE = $(BR2_SIKLU_FTP_URL)
 LOGROTATE_LICENSE = GPL-2.0+
 LOGROTATE_LICENSE_FILES = COPYING
 LOGROTATE_DEPENDENCIES = popt host-pkgconf

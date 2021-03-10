@@ -5,7 +5,8 @@
 ################################################################################
 
 READLINE_VERSION = 7.0
-READLINE_SITE = $(BR2_GNU_MIRROR)/readline
+#READLINE_SITE = $(BR2_GNU_MIRROR)/readline
+READLINE_SITE = $(BR2_SIKLU_FTP_URL)
 READLINE_INSTALL_STAGING = YES
 READLINE_DEPENDENCIES = ncurses
 HOST_READLINE_DEPENDENCIES = host-ncurses

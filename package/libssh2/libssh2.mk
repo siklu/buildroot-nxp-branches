@@ -5,7 +5,8 @@
 ################################################################################
 
 LIBSSH2_VERSION = 1.8.0
-LIBSSH2_SITE = http://www.libssh2.org/download
+#LIBSSH2_SITE = http://www.libssh2.org/download
+LIBSSH2_SITE = $(BR2_SIKLU_FTP_URL)
 LIBSSH2_LICENSE = BSD
 LIBSSH2_LICENSE_FILES = COPYING
 LIBSSH2_INSTALL_STAGING = YES

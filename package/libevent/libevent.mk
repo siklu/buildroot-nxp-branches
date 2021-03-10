@@ -5,7 +5,8 @@
 ################################################################################
 
 LIBEVENT_VERSION = 2.1.8-stable
-LIBEVENT_SITE = https://github.com/libevent/libevent/releases/download/release-$(LIBEVENT_VERSION)
+#LIBEVENT_SITE = https://github.com/libevent/libevent/releases/download/release-$(LIBEVENT_VERSION)
+LIBEVENT_SITE = $(BR2_SIKLU_FTP_URL)
 LIBEVENT_INSTALL_STAGING = YES
 LIBEVENT_LICENSE = BSD-3-Clause, OpenBSD
 LIBEVENT_LICENSE_FILES = LICENSE

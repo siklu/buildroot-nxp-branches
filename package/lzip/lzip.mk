@@ -5,7 +5,8 @@
 ################################################################################
 
 LZIP_VERSION = 1.18
-LZIP_SITE = http://download.savannah.gnu.org/releases/lzip
+#LZIP_SITE = http://download.savannah.gnu.org/releases/lzip
+LZIP_SITE = $(BR2_SIKLU_FTP_URL)
 LZIP_LICENSE = GPL-2.0+
 LZIP_LICENSE_FILES = COPYING
 

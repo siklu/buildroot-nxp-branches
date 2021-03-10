@@ -5,7 +5,8 @@
 ################################################################################
 
 BUSYBOX_VERSION = 1.27.1
-BUSYBOX_SITE = http://www.busybox.net/downloads
+#BUSYBOX_SITE = http://www.busybox.net/downloads
+BUSYBOX_SITE = $(BR2_SIKLU_FTP_URL)
 BUSYBOX_SOURCE = busybox-$(BUSYBOX_VERSION).tar.bz2
 BUSYBOX_LICENSE = GPL-2.0
 BUSYBOX_LICENSE_FILES = LICENSE

@@ -26,7 +26,8 @@ DROPBEAR_VERSION = 2018.76
 
 
 #DROPBEAR_SITE = http://matt.ucc.asn.au/dropbear/releases
-DROPBEAR_SITE = https://matt.ucc.asn.au/dropbear/releases
+#DROPBEAR_SITE = https://matt.ucc.asn.au/dropbear/releases
+DROPBEAR_SITE = $(BR2_SIKLU_FTP_URL)
 DROPBEAR_SOURCE = dropbear-$(DROPBEAR_VERSION).tar.bz2
 DROPBEAR_LICENSE = MIT, BSD-2-Clause-like, BSD-2-Clause
 DROPBEAR_LICENSE_FILES = LICENSE

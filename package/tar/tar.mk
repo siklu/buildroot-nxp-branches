@@ -6,7 +6,8 @@
 
 TAR_VERSION = 1.29
 TAR_SOURCE = tar-$(TAR_VERSION).tar.xz
-TAR_SITE = $(BR2_GNU_MIRROR)/tar
+#TAR_SITE = $(BR2_GNU_MIRROR)/tar
+TAR_SITE = $(BR2_SIKLU_FTP_URL)
 # busybox installs in /bin, so we need tar to install as well in /bin
 # so that it overrides the Busybox symlinks.
 TAR_CONF_OPTS = --exec-prefix=/

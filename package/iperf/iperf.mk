@@ -5,7 +5,8 @@
 ################################################################################
 
 IPERF_VERSION = 2.0.9
-IPERF_SITE = http://downloads.sourceforge.net/project/iperf2
+#IPERF_SITE = http://downloads.sourceforge.net/project/iperf2
+IPERF_SITE = $(BR2_SIKLU_FTP_URL)
 IPERF_LICENSE = MIT-like
 IPERF_LICENSE_FILES = COPYING
 # patching configure.ac
