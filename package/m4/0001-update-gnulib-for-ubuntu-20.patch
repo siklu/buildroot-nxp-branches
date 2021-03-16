@@ -1,0 +1,80 @@
+From: Viacheslav Volkov <viacheslav.v@siklu.com>
+Date: Tue, 16 Mar 2021 09:00:17 +0200
+Subject: [PATCH] PORTF-486: fix host-m4 compilation for ubuntu 20
+
+m4 sources in our buildroot contain gnulib code which is out of date and can't
+be compiled with new glibc (which comes with ubuntu 20). To make it work, we
+need to update some defines in this gnulib code.
+
+Error messages were:
+
+fseeko.c: In function 'rpl_fseeko':
+fseeko.c:110:4: error: #error "Please port gnulib fseeko.c to your platform! Look at the code in fseeko.c, then report this to bug-gnulib."
+  110 |   #error "Please port gnulib fseeko.c to your platform! Look at the code in fseeko.c, then report this to bug-gnulib."
+      |    ^~~~~
+
+freadahead.c: In function 'freadahead':
+freadahead.c:92:3: error: #error "Please port gnulib freadahead.c to your platform! Look at the definition of fflush, fread, ungetc on your system, then report this to bug-gnulib."
+   92 |  #error "Please port gnulib freadahead.c to your platform! Look at the definition of fflush, fread, ungetc on your system, then report this to bug-gnulib."
+      |   ^~~~~
+
+freadahead.c: In function 'freadahead':
+freadahead.c:33:26: error: '_IO_IN_BACKUP' undeclared (first use in this function)
+   33 |          + (fp->_flags & _IO_IN_BACKUP ? fp->_IO_save_end - fp->_IO_save_base :
+      |                          ^~~~~~~~~~~~~
+---
+ lib/freadahead.c | 3 ++-
+ lib/fseeko.c     | 3 ++-
+ lib/stdio-impl.h | 8 ++++++++
+ 3 files changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/lib/freadahead.c b/lib/freadahead.c
+index cfc969b..4ccaa09 100644
+--- a/lib/freadahead.c
++++ b/lib/freadahead.c
+@@ -25,7 +25,8 @@
+ size_t
+ freadahead (FILE *fp)
+ {
+-#if defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1 /* GNU libc, BeOS, Haiku, Linux libc5 */
++#if defined _IO_EOF_SEEN || defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1
++  /* GNU libc, BeOS, Haiku, Linux libc5 */
+   if (fp->_IO_write_ptr > fp->_IO_write_base)
+     return 0;
+   return (fp->_IO_read_end - fp->_IO_read_ptr)
+diff --git a/lib/fseeko.c b/lib/fseeko.c
+index 0c01c4f..a66e164 100644
+--- a/lib/fseeko.c
++++ b/lib/fseeko.c
+@@ -47,7 +47,8 @@ fseeko (FILE *fp, off_t offset, int whence)
+ #endif
+ 
+   /* These tests are based on fpurge.c.  */
+-#if defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1 /* GNU libc, BeOS, Haiku, Linux libc5 */
++#if defined _IO_EOF_SEEN || defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1
++  /* GNU libc, BeOS, Haiku, Linux libc5 */
+   if (fp->_IO_read_end == fp->_IO_read_ptr
+       && fp->_IO_write_ptr == fp->_IO_write_base
+       && fp->_IO_save_base == NULL)
+diff --git a/lib/stdio-impl.h b/lib/stdio-impl.h
+index 766d693..db05aa5 100644
+--- a/lib/stdio-impl.h
++++ b/lib/stdio-impl.h
+@@ -18,6 +18,14 @@
+    the same implementation of stdio extension API, except that some fields
+    have different naming conventions, or their access requires some casts.  */
+ 
++#if defined _IO_EOF_SEEN
++# if !defined _IO_UNBUFFERED
++#  define _IO_UNBUFFERED 0x2
++# endif
++# if !defined _IO_IN_BACKUP
++#  define _IO_IN_BACKUP 0x100
++# endif
++#endif
+ 
+ /* BSD stdio derived implementations.  */
+ 
+-- 
+2.30.2
+
