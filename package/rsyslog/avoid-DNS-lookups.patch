@@ -1,0 +1,22 @@
+From: Viacheslav Volkov <viacheslav.v@siklu.com>
+Subject: [PATCH] PORTF-502: avoid DNS lookups
+
+---
+ runtime/net.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/runtime/net.c b/runtime/net.c
+--- a/runtime/net.c
++++ b/runtime/net.c
+@@ -1156,7 +1156,7 @@ getLocalHostname(uchar **ppName)
+ 	char *dot = strstr(hnbuf, ".");
+ 	if(dot == NULL) {
+ 		/* we need to (try) to find the real name via resolver */
+-		struct hostent *hent = gethostbyname((char*)hnbuf);
++		struct hostent *hent = NULL; /* gethostbyname((char*)hnbuf); */
+ 		if(hent) {
+ 			int i = 0;
+ 			if(hent->h_aliases) {
+-- 
+2.30.2
+
