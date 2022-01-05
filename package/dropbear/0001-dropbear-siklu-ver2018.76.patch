@@ -1,6 +1,6 @@
 diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/cli-kex.c dropbear-2018.76_patched/cli-kex.c
 --- dropbear-2018.76_before_patch/cli-kex.c	2018-02-27 16:25:10.000000000 +0200
-+++ dropbear-2018.76_patched/cli-kex.c	2018-05-13 16:01:22.000000000 +0300
++++ dropbear-2018.76_patched/cli-kex.c	2021-12-21 12:58:31.936942851 +0200
 @@ -232,7 +232,7 @@
  
  	if (!homedir) {
@@ -12,7 +12,7 @@ diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before
  		}
 diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/cli-runopts.c dropbear-2018.76_patched/cli-runopts.c
 --- dropbear-2018.76_before_patch/cli-runopts.c	2018-02-27 16:25:10.000000000 +0200
-+++ dropbear-2018.76_patched/cli-runopts.c	2018-05-13 16:01:22.000000000 +0300
++++ dropbear-2018.76_patched/cli-runopts.c	2021-12-21 12:58:31.936942851 +0200
 @@ -733,7 +733,7 @@
  
  	uid = getuid();
@@ -24,7 +24,7 @@ diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before
  	} else {
 diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/common-session.c dropbear-2018.76_patched/common-session.c
 --- dropbear-2018.76_before_patch/common-session.c	2018-02-27 16:25:10.000000000 +0200
-+++ dropbear-2018.76_patched/common-session.c	2018-05-13 16:01:22.000000000 +0300
++++ dropbear-2018.76_patched/common-session.c	2021-12-21 12:58:31.936942851 +0200
 @@ -586,7 +586,7 @@
  	if (ses.authstate.pw_passwd)
  		m_free(ses.authstate.pw_passwd);
@@ -36,7 +36,7 @@ diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before
  	}
 diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/dbutil.c dropbear-2018.76_patched/dbutil.c
 --- dropbear-2018.76_before_patch/dbutil.c	2018-02-27 16:25:10.000000000 +0200
-+++ dropbear-2018.76_patched/dbutil.c	2018-05-13 16:01:22.000000000 +0300
++++ dropbear-2018.76_patched/dbutil.c	2021-12-21 12:58:31.936942851 +0200
 @@ -603,7 +603,7 @@
  char * expand_homedir_path(const char *inpath) {
  	struct passwd *pw = NULL;
@@ -48,7 +48,7 @@ diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before
  			char *buf = m_malloc(len);
 diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/default_options.h dropbear-2018.76_patched/default_options.h
 --- dropbear-2018.76_before_patch/default_options.h	2018-02-27 16:25:10.000000000 +0200
-+++ dropbear-2018.76_patched/default_options.h	2018-05-13 16:19:54.000000000 +0300
++++ dropbear-2018.76_patched/default_options.h	2021-12-21 13:55:22.973929761 +0200
 @@ -178,16 +178,18 @@
  #define MOTD_FILENAME "/etc/motd"
  
@@ -72,9 +72,18 @@ diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before
  
  /* ~/.ssh/authorized_keys authentication */
  #define DROPBEAR_SVR_PUBKEY_AUTH 1
+@@ -231,7 +233,7 @@
+ 
+ /* And then a global limit to avoid chewing memory if connections 
+  * come from many IPs */
+-#define MAX_UNAUTH_CLIENTS 30
++#define MAX_UNAUTH_CLIENTS 10 /*Siklu was 30*/
+ 
+ /* Default maximum number of failed authentication tries (server option) */
+ /* -T server option overrides */
 diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/dropbearkey.c dropbear-2018.76_patched/dropbearkey.c
 --- dropbear-2018.76_before_patch/dropbearkey.c	2018-02-27 16:25:10.000000000 +0200
-+++ dropbear-2018.76_patched/dropbearkey.c	2018-05-13 16:01:22.000000000 +0300
++++ dropbear-2018.76_patched/dropbearkey.c	2021-12-21 12:58:31.936942851 +0200
 @@ -326,7 +326,7 @@
  
  	/* a user@host comment is informative */
@@ -86,7 +95,7 @@ diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before
  	}
 diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/includes.h dropbear-2018.76_patched/includes.h
 --- dropbear-2018.76_before_patch/includes.h	2018-02-27 16:25:10.000000000 +0200
-+++ dropbear-2018.76_patched/includes.h	2018-05-13 16:01:22.000000000 +0300
++++ dropbear-2018.76_patched/includes.h	2021-12-21 12:58:31.936942851 +0200
 @@ -56,6 +56,7 @@
  #include <stdarg.h>
  #include <dirent.h>
@@ -97,7 +106,7 @@ diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before
  #include <utmp.h>
 diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/loginrec.c dropbear-2018.76_patched/loginrec.c
 --- dropbear-2018.76_before_patch/loginrec.c	2018-02-27 16:25:12.000000000 +0200
-+++ dropbear-2018.76_patched/loginrec.c	2018-05-13 16:01:22.000000000 +0300
++++ dropbear-2018.76_patched/loginrec.c	2021-12-21 12:58:31.936942851 +0200
 @@ -275,7 +275,7 @@
  
  	if (username) {
@@ -109,7 +118,7 @@ diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before
  					li->username);
 diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/siklu_dropbear.c dropbear-2018.76_patched/siklu_dropbear.c
 --- dropbear-2018.76_before_patch/siklu_dropbear.c	1970-01-01 02:00:00.000000000 +0200
-+++ dropbear-2018.76_patched/siklu_dropbear.c	2018-05-13 16:01:22.000000000 +0300
++++ dropbear-2018.76_patched/siklu_dropbear.c	2021-12-21 12:58:31.936942851 +0200
 @@ -0,0 +1,153 @@
 +/*
 + * siklu_dropbear.c
@@ -266,7 +275,7 @@ diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before
 +}
 diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/siklu_pwd.h dropbear-2018.76_patched/siklu_pwd.h
 --- dropbear-2018.76_before_patch/siklu_pwd.h	1970-01-01 02:00:00.000000000 +0200
-+++ dropbear-2018.76_patched/siklu_pwd.h	2018-05-13 16:01:22.000000000 +0300
++++ dropbear-2018.76_patched/siklu_pwd.h	2021-12-21 12:58:31.940942942 +0200
 @@ -0,0 +1,31 @@
 +/*
 + * siklu_pwd.h
@@ -301,7 +310,7 @@ diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before
 +#endif /* SIKLU_PWD_H_ */
 diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/svr-authpam.c dropbear-2018.76_patched/svr-authpam.c
 --- dropbear-2018.76_before_patch/svr-authpam.c	2018-02-27 16:25:12.000000000 +0200
-+++ dropbear-2018.76_patched/svr-authpam.c	2018-05-13 16:01:22.000000000 +0300
++++ dropbear-2018.76_patched/svr-authpam.c	2021-12-21 12:58:31.940942942 +0200
 @@ -238,9 +238,10 @@
  	/* (void) pam_set_item(pamHandlep, PAM_FAIL_DELAY, (void*) pamDelayFunc); */
  
@@ -358,7 +367,7 @@ diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before
  	dropbear_log(LOG_NOTICE, "PAM password auth succeeded for '%s' from %s",
 diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/svr-chansession.c dropbear-2018.76_patched/svr-chansession.c
 --- dropbear-2018.76_before_patch/svr-chansession.c	2018-02-27 16:25:12.000000000 +0200
-+++ dropbear-2018.76_patched/svr-chansession.c	2018-05-13 16:01:22.000000000 +0300
++++ dropbear-2018.76_patched/svr-chansession.c	2021-12-21 12:58:31.940942942 +0200
 @@ -593,7 +593,7 @@
  		dropbear_exit("Out of memory"); /* TODO disconnect */
  	}
@@ -378,3 +387,15 @@ diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before
  #else /* don't HAVE_CLEARENV */
  	/* Yay for posix. */
  	if (environ) {
+diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/sysoptions.h dropbear-2018.76_patched/sysoptions.h
+--- dropbear-2018.76_before_patch/sysoptions.h	2018-02-27 16:25:12.000000000 +0200
++++ dropbear-2018.76_patched/sysoptions.h	2021-12-21 13:54:28.240688223 +0200
+@@ -173,7 +173,7 @@
+ 								RECV_WINDOWEXTEND bytes */
+ #define MAX_RECV_WINDOW (1024*1024) /* 1 MB should be enough */
+ 
+-#define MAX_CHANNELS 1000 /* simple mem restriction, includes each tcp/x11
++#define MAX_CHANNELS 10/*Siklu, was 1000*/ /* simple mem restriction, includes each tcp/x11
+ 							connection, so can't be _too_ small */
+ 
+ #define MAX_STRING_LEN (MAX(MAX_CMD_LEN, 2400)) /* Sun SSH needs 2400 for algos,
