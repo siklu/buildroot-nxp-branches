@@ -1,23 +1,22 @@
-#############################################################
+################################################################################
 #
 # strace
 #
-#############################################################
+################################################################################
 
-STRACE_VERSION = 4.7
+STRACE_VERSION = 4.18
 STRACE_SOURCE = strace-$(STRACE_VERSION).tar.xz
-STRACE_SITE = http://downloads.sourceforge.net/project/strace/strace/$(STRACE_VERSION)
-STRACE_LICENSE = BSD-3c
-STRACE_LICENSE_FILES = COPYRIGHT
+#STRACE_SITE = http://downloads.sourceforge.net/project/strace/strace/$(STRACE_VERSION)
+STRACE_SITE = $(BR2_SIKLU_FTP_URL)
+STRACE_LICENSE = BSD-3-Clause
+STRACE_LICENSE_FILES = COPYING
 
-STRACE_CONF_ENV = ac_cv_header_linux_if_packet_h=yes \
-		  ac_cv_header_linux_netlink_h=yes
-
-ifeq ($(BR2_LARGEFILE),y)
-# strace gets confused when lfs mode is forced, so don't
-STRACE_CONF_ENV += \
-	CFLAGS="$(filter-out -D_FILE_OFFSET_BITS=64,$(TARGET_CFLAGS))" \
-	CPPFLAGS="$(filter-out -D_FILE_OFFSET_BITS=64,$(TARGET_CPPFLAGS))"
+# strace bundle some kernel headers to build libmpers, this mixes userspace
+# headers and kernel headers which break the build with musl.
+# The stddef.h from gcc is used instead of the one from musl.
+ifeq ($(BR2_TOOLCHAIN_USES_MUSL),y)
+STRACE_CONF_OPTS += st_cv_m32_mpers=no \
+	st_cv_mx32_mpers=no
 endif
 
 define STRACE_REMOVE_STRACE_GRAPH

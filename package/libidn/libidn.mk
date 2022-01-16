@@ -1,15 +1,17 @@
-#############################################################
+################################################################################
 #
 # libidn
 #
-#############################################################
+################################################################################
 
-LIBIDN_VERSION = 1.25
+LIBIDN_VERSION = 1.33
 LIBIDN_SITE = $(BR2_GNU_MIRROR)/libidn
 LIBIDN_INSTALL_STAGING = YES
 LIBIDN_CONF_ENV = EMACS="no"
-LIBIDN_CONF_OPT = --disable-java --enable-csharp=no
-LIBIDN_DEPENDENCIES = host-pkgconf $(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),gettext) $(if $(BR2_PACKAGE_LIBICONV),libiconv)
+LIBIDN_CONF_OPTS = --disable-java --enable-csharp=no
+LIBIDN_DEPENDENCIES = host-pkgconf $(TARGET_NLS_DEPENDENCIES) $(if $(BR2_PACKAGE_LIBICONV),libiconv)
+LIBIDN_LICENSE = GPL-2.0+, GPL-3.0+, LGPL-3.0+
+LIBIDN_LICENSE_FILES = COPYINGv2 COPYINGv3 COPYING.LESSERv3
 
 define LIBIDN_REMOVE_BINARY
 	rm -f $(TARGET_DIR)/usr/bin/idn
@@ -24,10 +26,5 @@ define LIBIDN_REMOVE_EMACS_STUFF
 endef
 
 LIBIDN_POST_INSTALL_TARGET_HOOKS += LIBIDN_REMOVE_EMACS_STUFF
-
-define LIBIDN_UNINSTALL_TARGET_CMDS
-	rm -f $(TARGET_DIR)/usr/lib/libidn*
-	rm -f $(TARGET_DIR)/usr/bin/idn
-endef
 
 $(eval $(autotools-package))

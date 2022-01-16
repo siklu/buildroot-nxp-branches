@@ -1,22 +1,14 @@
-#############################################################
+################################################################################
 #
 # python-meld3
 #
-#############################################################
+################################################################################
 
-PYTHON_MELD3_VERSION = 0.6.8
+PYTHON_MELD3_VERSION = 1.0.2
 PYTHON_MELD3_SOURCE = meld3-$(PYTHON_MELD3_VERSION).tar.gz
-PYTHON_MELD3_SITE = http://pypi.python.org/packages/source/m/meld3/
-PYTHON_MELD3_DEPENDENCIES = python
-PYTHON_MELD3_LICENSE = ZPLv2.1
+PYTHON_MELD3_SITE = https://pypi.python.org/packages/45/a0/317c6422b26c12fe0161e936fc35f36552069ba8e6f7ecbd99bbffe32a5f
+PYTHON_MELD3_LICENSE = ZPL-2.1
 PYTHON_MELD3_LICENSE_FILES = COPYRIGHT.txt LICENSE.txt
+PYTHON_MELD3_SETUP_TYPE = setuptools
 
-define PYTHON_MELD3_BUILD_CMDS
-	(cd $(@D); $(HOST_DIR)/usr/bin/python setup.py build)
-endef
-
-define PYTHON_MELD3_INSTALL_TARGET_CMDS
-	(cd $(@D); $(HOST_DIR)/usr/bin/python setup.py install --prefix=$(TARGET_DIR)/usr)
-endef
-
-$(eval $(generic-package))
+$(eval $(python-package))

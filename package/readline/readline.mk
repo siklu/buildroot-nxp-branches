@@ -1,24 +1,37 @@
-#############################################################
+################################################################################
 #
-# build GNU readline
+# readline
 #
-#############################################################
+################################################################################
 
-READLINE_VERSION = 6.2
-READLINE_SOURCE = readline-$(READLINE_VERSION).tar.gz
-READLINE_SITE = $(BR2_GNU_MIRROR)/readline
+READLINE_VERSION = 7.0
+#READLINE_SITE = $(BR2_GNU_MIRROR)/readline
+READLINE_SITE = $(BR2_SIKLU_FTP_URL)
 READLINE_INSTALL_STAGING = YES
 READLINE_DEPENDENCIES = ncurses
-READLINE_CONF_ENV = bash_cv_func_sigsetjmp=yes
+HOST_READLINE_DEPENDENCIES = host-ncurses
+READLINE_CONF_ENV = bash_cv_func_sigsetjmp=yes \
+	bash_cv_wcwidth_broken=no
+READLINE_LICENSE = GPL-3.0+
+READLINE_LICENSE_FILES = COPYING
 
-define READLINE_INSTALL_TARGET_CMDS
-	$(MAKE1) DESTDIR=$(TARGET_DIR) -C $(@D) uninstall
-	$(MAKE1) DESTDIR=$(TARGET_DIR) -C $(@D) install-shared uninstall-doc
-	chmod 775 $(TARGET_DIR)/usr/lib/libreadline.so.$(READLINE_VERSION) \
-		$(TARGET_DIR)/usr/lib/libhistory.so.$(READLINE_VERSION)
-	$(STRIPCMD) $(STRIP_STRIP_UNNEEDED) \
-		$(TARGET_DIR)/usr/lib/libreadline.so.$(READLINE_VERSION) \
-		$(TARGET_DIR)/usr/lib/libhistory.so.$(READLINE_VERSION)
+define READLINE_PURGE_EXAMPLES
+	rm -rf $(TARGET_DIR)/usr/share/readline
 endef
+READLINE_POST_INSTALL_TARGET_HOOKS += READLINE_PURGE_EXAMPLES
+
+define READLINE_INSTALL_INPUTRC
+	$(INSTALL) -D -m 644 package/readline/inputrc $(TARGET_DIR)/etc/inputrc
+endef
+READLINE_POST_INSTALL_TARGET_HOOKS += READLINE_INSTALL_INPUTRC
+
+ifneq ($(BR2_STATIC_LIBS),y)
+# libraries get installed read only, so strip fails
+define READLINE_INSTALL_FIXUPS_SHARED
+	chmod +w $(addprefix $(TARGET_DIR)/usr/lib/,libhistory.so.* libreadline.so.*)
+endef
+READLINE_POST_INSTALL_TARGET_HOOKS += READLINE_INSTALL_FIXUPS_SHARED
+endif
 
 $(eval $(autotools-package))
+$(eval $(host-autotools-package))

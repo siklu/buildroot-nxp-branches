@@ -1,6 +1,5 @@
 config BR2_PACKAGE_GETTEXT
 	bool "gettext"
-	depends on BR2_NEEDS_GETTEXT
 	depends on BR2_USE_WCHAR
 	help
 	  The GNU `gettext' utilities are a set of tools that provide a
@@ -13,13 +12,14 @@ config BR2_PACKAGE_GETTEXT
 
 	  http://www.gnu.org/software/gettext/
 
-config BR2_PACKAGE_GETTEXT_TOOLS
-	bool "Install gettext tools"
-	depends on BR2_PACKAGE_GETTEXT
-	help
-	  This option allows to install the complete gettext suite in
-	  the target filesystem. This is typically not useful for
-	  correct operation of programs.
+if BR2_PACKAGE_GETTEXT
 
-comment "gettext requires a toolchain with WCHAR support"
-	depends on BR2_NEEDS_GETTEXT && !BR2_USE_WCHAR
+config BR2_PACKAGE_GETTEXT_PROVIDES_LIBINTL
+	bool
+	depends on !BR2_TOOLCHAIN_HAS_FULL_GETTEXT
+	default y if BR2_SYSTEM_ENABLE_NLS
+
+endif
+
+comment "gettext needs a toolchain w/ wchar"
+	depends on !BR2_USE_WCHAR

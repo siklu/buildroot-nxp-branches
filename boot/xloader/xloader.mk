@@ -1,13 +1,14 @@
-#############################################################
+################################################################################
 #
 # x-loader
 #
-#############################################################
-XLOADER_VERSION    = 6f3a26101303051e0f91b6213735b68ce804e94e
-XLOADER_SITE       = git://gitorious.org/x-loader/x-loader.git
+################################################################################
+
+XLOADER_VERSION = 6f3a26101303051e0f91b6213735b68ce804e94e
+XLOADER_SITE = git://gitorious.org/x-loader/x-loader.git
 XLOADER_BOARD_NAME = $(call qstrip,$(BR2_TARGET_XLOADER_BOARDNAME))
 
-XLOADER_LICENSE = GPLv2+
+XLOADER_LICENSE = GPL-2.0+
 XLOADER_LICENSE_FILES = README
 
 XLOADER_INSTALL_IMAGES = YES
@@ -24,17 +25,8 @@ endef
 
 $(eval $(generic-package))
 
-#############################################################
-#
-# Toplevel Makefile options
-#
-#############################################################
-ifeq ($(BR2_TARGET_XLOADER),y)
-# we NEED a board name unless we're at make source
-ifeq ($(filter source,$(MAKECMDGOALS)),)
+ifeq ($(BR2_TARGET_XLOADER)$(BR_BUILDING),yy)
 ifeq ($(XLOADER_BOARD_NAME),)
 $(error NO x-loader board name set. Check your BR2_BOOT_XLOADER_BOARDNAME setting)
 endif
-endif
-
 endif

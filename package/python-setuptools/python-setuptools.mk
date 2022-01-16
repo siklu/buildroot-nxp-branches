@@ -1,32 +1,23 @@
-#############################################################
+################################################################################
 #
 # python-setuptools
 #
-#############################################################
+################################################################################
 
-PYTHON_SETUPTOOLS_VERSION = 0.6c11
-PYTHON_SETUPTOOLS_SOURCE  = setuptools-$(PYTHON_SETUPTOOLS_VERSION).tar.gz
-PYTHON_SETUPTOOLS_SITE    = http://pypi.python.org/packages/source/s/setuptools
-PYTHON_SETUPTOOLS_DEPENDENCIES = python
+PYTHON_SETUPTOOLS_VERSION = v36.0.1
+PYTHON_SETUPTOOLS_SITE = $(call github,pypa,setuptools,$(PYTHON_SETUPTOOLS_VERSION))
+PYTHON_SETUPTOOLS_LICENSE = MIT
+PYTHON_SETUPTOOLS_LICENSE_FILES = LICENSE
+PYTHON_SETUPTOOLS_SETUP_TYPE = setuptools
 
-define HOST_PYTHON_SETUPTOOLS_BUILD_CMDS
-	(cd $(@D); $(HOST_DIR)/usr/bin/python setup.py build)
+# recent setuptools versions require bootstrap.py to be invoked
+# before the standard setup process.
+define PYTHON_SETUPTOOLS_RUN_BOOTSTRAP
+	cd  $(@D) && $(HOST_DIR)/bin/python ./bootstrap.py
 endef
 
-define PYTHON_SETUPTOOLS_BUILD_CMDS
-	(cd $(@D); $(HOST_DIR)/usr/bin/python setup.py build)
-endef
+PYTHON_SETUPTOOLS_PRE_CONFIGURE_HOOKS = PYTHON_SETUPTOOLS_RUN_BOOTSTRAP
+HOST_PYTHON_SETUPTOOLS_PRE_CONFIGURE_HOOKS = PYTHON_SETUPTOOLS_RUN_BOOTSTRAP
 
-define HOST_PYTHON_SETUPTOOLS_INSTALL_CMDS
-	(cd $(@D); PYTHONPATH="$(HOST_DIR)/usr/lib/python$(PYTHON_VERSION_MAJOR)/site-packages"\
-	$(HOST_DIR)/usr/bin/python setup.py install --prefix=$(HOST_DIR)/usr)
-endef
-
-define PYTHON_SETUPTOOLS_INSTALL_TARGET_CMDS
-	(cd $(@D); PYTHONPATH="$(TARGET_DIR)/usr/lib/python$(PYTHON_VERSION_MAJOR)/site-packages"\
-	$(HOST_DIR)/usr/bin/python setup.py install --prefix=$(TARGET_DIR)/usr)
-endef
-
-$(eval $(generic-package))
-$(eval $(host-generic-package))
-
+$(eval $(python-package))
+$(eval $(host-python-package))

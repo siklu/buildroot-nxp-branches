@@ -3,34 +3,134 @@
 # Starts dropbear sshd.
 #
 
-# Make sure the dropbearkey progam exists
-[ -f /usr/bin/dropbearkey ] || exit 0
+# special for Siklu
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/sw/lib
+
+# Allow a few customizations from a config file
+test -r /etc/default/dropbear && . /etc/default/dropbear
+
+mkdir -p /var/log
+
+
+if [[ -L "/etc/dropbear" && -d "/etc/dropbear" ]]
+then
+    echo "/etc/dropbear is a symlink to a directory, remove it"
+    rm /etc/dropbear
+fi
+mkdir -p /etc/dropbear
+
+
+if ! test -e /var/log/lastlog; then touch /var/log/lastlog; fi 
+
+KEYGEN=dropbearkey
+ECDSA_KEY=/etc/dropbear/dropbear_ecdsa_host_key
+RSA_KEY=/etc/dropbear/dropbear_rsa_host_key
+DSS_KEY=/etc/dropbear/dropbear_dss_host_key
+
+banner_file="/tmp/ssh_banner"
+banner_file_in_web_resources="/tmp/web_resources/ssh_banner"
+
+
+
+do_ecdsa_keygen() {
+    if [ ! -s $ECDSA_KEY ] || [ ! -e $ECDSA_KEY ]; then
+	rm -f $ECDSA_KEY
+        echo -n "Generating dropbear ECDSA host key: "
+        if $KEYGEN -t ecdsa -f $ECDSA_KEY >&/dev/null; then
+            chmod 600 $ECDSA_KEY
+            echo "ECDSA key generation success"
+            echo
+        else
+            echo "**** ECDSA key generation fail****"
+            echo
+            exit 1
+        fi
+    fi
+}
+
+do_rsa_keygen() {
+    if [ ! -s $RSA_KEY ] || [ ! -e $RSA_KEY ]; then
+	rm -f $RSA_KEY
+        echo -n "Generating dropbear RSA host key: "
+        if $KEYGEN -t rsa -f $RSA_KEY >&/dev/null; then
+            chmod 600 $RSA_KEY
+            echo "RSA key generation success"
+            echo
+        else
+            echo "**** RSA key generation fail ****"
+            echo
+            exit 1
+        fi
+    fi
+}
+
+do_dss_keygen() {
+    if [ ! -s $DSS_KEY ] || [ ! -e $DSS_KEY ]; then
+	rm -f $DSS_KEY
+        echo -n "Generating dropbear DSS host key: "
+        if $KEYGEN -t dss -f $DSS_KEY >&/dev/null; then
+            chmod 600 $DSS_KEY
+            echo "DSS key generation success"
+            echo
+        else
+            echo "**** DSS key generation fail ****"
+            echo
+            exit 1
+        fi
+    fi
+}
+
+do_ssh_banner()
+{
+	if [ -e ${banner_file_in_web_resources} ]
+	then
+		echo "Use predefined SSH banner"
+		cp ${banner_file_in_web_resources} ${banner_file}
+	else
+		echo "Generate SSH banner"
+		/home/sw/bin/sys_util -b
+	fi
+}
+
 
 start() {
- 	echo -n "Starting dropbear sshd: "
-	# Make sure dropbear directory exists
-	if [ ! -d /etc/dropbear ] ; then
-		mkdir -p /etc/dropbear
-	fi
-	# Check for the Dropbear RSA key
-	if [ ! -f /etc/dropbear/dropbear_rsa_host_key ] ; then
-		echo -n "generating rsa key... "
-		/usr/bin/dropbearkey -t rsa -f /etc/dropbear/dropbear_rsa_host_key > /dev/null 2>&1
+	  # DROPBEAR_ARGS="$DROPBEAR_ARGS -R -k -j -K 10 -I 0 -b /tmp/ssh_banner"
+	  DROPBEAR_ARGS="$DROPBEAR_ARGS -k -j -K 10 -I 0 -b /tmp/ssh_banner"
+
+	  do_ecdsa_keygen
+	  do_rsa_keygen
+	  do_dss_keygen
+	  do_ssh_banner
+
+
+	# If /etc/dropbear is a symlink to /var/run/dropbear, and
+	#   - the filesystem is RO (i.e. we can not rm the symlink),
+	#     create the directory pointed to by the symlink.
+	#   - the filesystem is RW (i.e. we can rm the symlink),
+	#     replace the symlink with an actual directory
+	if [ -L /etc/dropbear \
+	     -a "$(readlink /etc/dropbear)" = "/var/run/dropbear" ]
+	then
+		if rm -f /etc/dropbear >/dev/null 2>&1; then
+			mkdir -p /etc/dropbear
+		else
+			echo "No persistent location to store SSH host keys. New keys will be"
+			echo "generated at each boot. Are you sure this is what you want to do?"
+			mkdir -p "$(readlink /etc/dropbear)"
+		fi
 	fi
 
-	# Check for the Dropbear DSS key
-	if [ ! -f /etc/dropbear/dropbear_dss_host_key ] ; then
-		echo -n "generating dsa key... "
-		/usr/bin/dropbearkey -t dss -f /etc/dropbear/dropbear_dss_host_key > /dev/null 2>&1
-	fi
+	printf "Starting dropbear sshd: "
 	umask 077
-	start-stop-daemon -S -q -p /var/run/dropbear.pid --exec /usr/sbin/dropbear
-	echo "OK"
+
+	start-stop-daemon -S -q -p /var/run/dropbear.pid \
+		--exec /usr/sbin/dropbear -- $DROPBEAR_ARGS
+	[ $? = 0 ] && echo "OK" || echo "FAIL"
 }
 stop() {
-	echo -n "Stopping dropbear sshd: "
+	printf "Stopping dropbear sshd: "
 	start-stop-daemon -K -q -p /var/run/dropbear.pid
-	echo "OK"
+	[ $? = 0 ] && echo "OK" || echo "FAIL"
 }
 restart() {
 	stop
@@ -53,4 +153,3 @@ case "$1" in
 esac
 
 exit $?
-

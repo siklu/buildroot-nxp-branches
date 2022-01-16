@@ -1,38 +1,39 @@
-#############################################################
+################################################################################
 #
 # logrotate
 #
-#############################################################
-LOGROTATE_VERSION = 3.7.9
-LOGROTATE_SOURCE = logrotate-$(LOGROTATE_VERSION).tar.gz
-LOGROTATE_SITE = https://fedorahosted.org/releases/l/o/logrotate/
-LOGROTATE_LICENSE = GPLv2+
+################################################################################
+
+LOGROTATE_VERSION = 3.11.0
+#LOGROTATE_SITE = $(call github,logrotate,logrotate,$(LOGROTATE_VERSION))
+LOGROTATE_SITE = $(BR2_SIKLU_FTP_URL)
+LOGROTATE_LICENSE = GPL-2.0+
 LOGROTATE_LICENSE_FILES = COPYING
+LOGROTATE_DEPENDENCIES = popt host-pkgconf
+# tarball does not have a generated configure script
+LOGROTATE_AUTORECONF = YES
+LOGROTATE_CONF_ENV = LIBS="`$(PKG_CONFIG_HOST_BINARY) --libs popt`"
 
-LOGROTATE_DEPENDENCIES = popt
+LOGROTATE_CONF_OPTS += CFLAGS="$(TARGET_CFLAGS) -fcommon"
 
-define LOGROTATE_BUILD_CMDS
-	$(MAKE) CC="$(TARGET_CC) $(TARGET_CFLAGS)" LDFLAGS="$(LDFLAGS)" -C $(@D)
-endef
+ifeq ($(BR2_PACKAGE_LIBSELINUX),y)
+LOGROTATE_CONF_OPTS += --with-selinux
+LOGROTATE_DEPENDENCIES += libselinux
+else
+LOGROTATE_CONF_OPTS += --without-selinux
+endif
 
-define LOGROTATE_INSTALL_TARGET_CMDS
-	$(MAKE) PREFIX=$(TARGET_DIR) -C $(@D) install
-	if [ ! -f $(TARGET_DIR)/etc/logrotate.conf ]; then \
-		$(INSTALL) -m 0644 package/logrotate/logrotate.conf $(TARGET_DIR)/etc/logrotate.conf; \
-	fi
+ifeq ($(BR2_PACKAGE_ACL),y)
+LOGROTATE_DEPENDENCIES += acl
+LOGROTATE_CONF_OPTS += --with-acl
+else
+LOGROTATE_CONF_OPTS += --without-acl
+endif
+
+define LOGROTATE_INSTALL_TARGET_CONF
+	$(INSTALL) -m 0644 package/logrotate/logrotate.conf $(TARGET_DIR)/etc/logrotate.conf
 	$(INSTALL) -d -m 0755 $(TARGET_DIR)/etc/logrotate.d
 endef
+LOGROTATE_POST_INSTALL_TARGET_HOOKS += LOGROTATE_INSTALL_TARGET_CONF
 
-define LOGROTATE_UNINSTALL_TARGET_CMDS
-	rm -f $(TARGET_DIR)/usr/sbin/logrotate
-	rm -f $(TARGET_DIR)/etc/logrotate.conf
-	rm -f $(TARGET_DIR)/usr/man/man5/logrotate.conf.5
-	rm -f $(TARGET_DIR)/usr/man/man8/logrotate.8
-	rmdir --ignore-fail-on-non-empty $(TARGET_DIR)/etc/logrotate.d
-endef
-
-define LOGROTATE_CLEAN_CMDS
-	-$(MAKE) -C $(@D) clean
-endef
-
-$(eval $(generic-package))
+$(eval $(autotools-package))

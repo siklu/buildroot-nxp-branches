@@ -1,15 +1,23 @@
-HIAWATHA_VERSION = 8.6
-HIAWATHA_SITE = http://www.hiawatha-webserver.org/files
-HIAWATHA_LICENSE = GPLv2
+################################################################################
+#
+# hiawatha
+#
+################################################################################
+
+HIAWATHA_VERSION = 10.6
+HIAWATHA_SITE = https://www.hiawatha-webserver.org/files
+HIAWATHA_DEPENDENCIES = zlib
+HIAWATHA_LICENSE = GPL-2.0
 HIAWATHA_LICENSE_FILES = LICENSE
 
 ifeq ($(BR2_PACKAGE_HIAWATHA_SSL),y)
-HIAWATHA_CONF_OPT += -DENABLE_SSL_EXTERNAL=ON -DENABLE_SSL=ON
-HIAWATHA_DEPENDENCIES += polarssl
+HIAWATHA_CONF_OPTS += -DUSE_SYSTEM_MBEDTLS=ON
+HIAWATHA_DEPENDENCIES += mbedtls
+else
+HIAWATHA_CONF_OPTS += -DENABLE_TLS=OFF
 endif
 
-HIAWATHA_CONF_OPT += \
-	$(if $(BR2_INET_IPV6),,-DENABLE_IPV6=OFF) \
+HIAWATHA_CONF_OPTS += \
 	-DENABLE_TOOLKIT=OFF \
 	-DENABLE_XSLT=OFF \
 	-DCONFIG_DIR=/etc/hiawatha \

@@ -1,19 +1,50 @@
-#############################################################
+################################################################################
 #
 # dropbear
 #
-#############################################################
+#	Siklu aplied changes:
+#	1. add macro DROPBEAR_FIX_MAKEFILE
+#	2.		DROPBEAR_POST_CONFIGURE_HOOKS
+#	2. add patch:
+# 		Patch file created by follow command:
+#			diff -uNr  dropbear-2016.74.orig dropbear-2016.74.new   -x *.log -x *.sta* -x .p*  -x Makefile* > dropbear-siklu-ver2016.74.patch
+#
+#	Check that dropbear's Makefile has line:
+#		LIBS+=-lutil -lz -lpam 
+#
+#	before generate patch file - clean all files except *.h and *.c:
+#		find . -not -name "*.c" -not -name "*.h"|xargs rm -rf
+################################################################################
 
-DROPBEAR_VERSION = 2012.55
-DROPBEAR_SITE = http://matt.ucc.asn.au/dropbear/releases
-DROPBEAR_TARGET_BINS = dbclient dropbearkey dropbearconvert scp ssh
-DROPBEAR_MAKE =	$(MAKE) MULTI=1 SCPPROGRESS=1 \
-		PROGRAMS="dropbear dbclient dropbearkey dropbearconvert scp"
+# - siklu replaced by same MRV version. Siklu uses in all projects version 2016.74
+#	latest buildroot version 2017.75 
+#	13 may 2018 move to version 2018.76
+# DROPBEAR_VERSION = 2016.74
+# DROPBEAR_VERSION = 2017.75  
+DROPBEAR_VERSION = 2018.76
 
-DROPBEAR_LICENSE = MIT, BSD-2c-like, BSD-2c
+
+
+#DROPBEAR_SITE = http://matt.ucc.asn.au/dropbear/releases
+#DROPBEAR_SITE = https://matt.ucc.asn.au/dropbear/releases
+DROPBEAR_SITE = $(BR2_SIKLU_FTP_URL)
+DROPBEAR_SOURCE = dropbear-$(DROPBEAR_VERSION).tar.bz2
+DROPBEAR_LICENSE = MIT, BSD-2-Clause-like, BSD-2-Clause
 DROPBEAR_LICENSE_FILES = LICENSE
+DROPBEAR_TARGET_BINS = dropbearkey dropbearconvert scp
+DROPBEAR_PROGRAMS = dropbear $(DROPBEAR_TARGET_BINS)
 
-ifeq ($(BR2_PREFER_STATIC_LIB),y)
+ifeq ($(BR2_PACKAGE_DROPBEAR_CLIENT),y)
+# Build dbclient, and create a convenience symlink named ssh
+DROPBEAR_PROGRAMS += dbclient
+DROPBEAR_TARGET_BINS += dbclient ssh
+endif
+
+DROPBEAR_MAKE = \
+	$(MAKE) MULTI=1 SCPPROGRESS=1 \
+	PROGRAMS="$(DROPBEAR_PROGRAMS)"
+
+ifeq ($(BR2_STATIC_LIBS),y)
 DROPBEAR_MAKE += STATIC=1
 endif
 
@@ -23,53 +54,83 @@ endef
 
 DROPBEAR_POST_EXTRACT_HOOKS += DROPBEAR_FIX_XAUTH
 
-define DROPBEAR_DISABLE_REVERSE_DNS
-	$(SED) 's,^#define DO_HOST_LOOKUP.*,/* #define DO_HOST_LOOKUP */,' $(@D)/options.h
+define DROPBEAR_FIX_MAKEFILE
+	$(SED) 's,gensignkey.o gendss.o genrsa.o,gensignkey.o gendss.o genrsa.o siklu_dropbear.o,g' $(@D)/Makefile
+	$(SED) 's,-lutil,-lutil -lz -lpam,g' $(@D)/Makefile
+	#$(SED) 's,scpmisc.o compat.o,scpmisc.o compat.o siklu_dropbear.o,g' $(@D)/Makefile
+endef
+
+DROPBEAR_DEPENDENCIES += zlib linux-pam
+
+DROPBEAR_POST_CONFIGURE_HOOKS = DROPBEAR_FIX_MAKEFILE
+
+
+define DROPBEAR_ENABLE_REVERSE_DNS
+	$(SED) 's:.*\(#define DO_HOST_LOOKUP\).*:\1:' $(@D)/options.h
 endef
 
 define DROPBEAR_BUILD_SMALL
-	echo "#define DROPBEAR_SMALL_CODE" >>$(@D)/options.h
-	echo "#define NO_FAST_EXPTMOD" >>$(@D)/options.h
+	$(SED) 's:.*\(#define NO_FAST_EXPTMOD\).*:\1:' $(@D)/options.h
 endef
 
 define DROPBEAR_BUILD_FEATURED
-	echo "#define DROPBEAR_BLOWFISH" >>$(@D)/options.h
+	$(SED) 's:^#define DROPBEAR_SMALL_CODE::' $(@D)/options.h
+	$(SED) 's:.*\(#define DROPBEAR_BLOWFISH\).*:\1:' $(@D)/options.h
+	$(SED) 's:.*\(#define DROPBEAR_TWOFISH128\).*:\1:' $(@D)/options.h
+	$(SED) 's:.*\(#define DROPBEAR_TWOFISH256\).*:\1:' $(@D)/options.h
 endef
 
-ifeq ($(BR2_PACKAGE_DROPBEAR_DISABLE_REVERSEDNS),y)
-DROPBEAR_POST_EXTRACT_HOOKS += DROPBEAR_DISABLE_REVERSE_DNS
+define DROPBEAR_DISABLE_STANDALONE
+	$(SED) 's:\(#define NON_INETD_MODE\):/*\1 */:' $(@D)/options.h
+endef
+
+define DROPBEAR_INSTALL_INIT_SYSTEMD
+	$(INSTALL) -D -m 644 package/dropbear/dropbear.service \
+		$(TARGET_DIR)/usr/lib/systemd/system/dropbear.service
+	mkdir -p $(TARGET_DIR)/etc/systemd/system/multi-user.target.wants
+	ln -fs ../../../../usr/lib/systemd/system/dropbear.service \
+		$(TARGET_DIR)/etc/systemd/system/multi-user.target.wants/dropbear.service
+endef
+
+ifeq ($(BR2_USE_MMU),y)
+define DROPBEAR_INSTALL_INIT_SYSV
+	$(INSTALL) -D -m 755 package/dropbear/S50dropbear \
+		$(TARGET_DIR)/etc/init.d/S50dropbear
+endef
+else
+DROPBEAR_POST_EXTRACT_HOOKS += DROPBEAR_DISABLE_STANDALONE
+endif
+
+ifeq ($(BR2_PACKAGE_DROPBEAR_DISABLE_REVERSEDNS),)
+DROPBEAR_POST_EXTRACT_HOOKS += DROPBEAR_ENABLE_REVERSE_DNS
 endif
 
 ifeq ($(BR2_PACKAGE_DROPBEAR_SMALL),y)
 DROPBEAR_POST_EXTRACT_HOOKS += DROPBEAR_BUILD_SMALL
-DROPBEAR_CONF_OPT += --disable-zlib
+DROPBEAR_CONF_OPTS += --disable-zlib
 else
 DROPBEAR_POST_EXTRACT_HOOKS += DROPBEAR_BUILD_FEATURED
 DROPBEAR_DEPENDENCIES += zlib
 endif
 
 ifneq ($(BR2_PACKAGE_DROPBEAR_WTMP),y)
-DROPBEAR_CONF_OPT += --disable-wtmp
+DROPBEAR_CONF_OPTS += --disable-wtmp
 endif
 
 ifneq ($(BR2_PACKAGE_DROPBEAR_LASTLOG),y)
-DROPBEAR_CONF_OPT += --disable-lastlog
+DROPBEAR_CONF_OPTS += --disable-lastlog
 endif
+
+# siklu - enable PAM support
+DROPBEAR_CONF_OPTS += --enable-pam  --quiet
+
 
 define DROPBEAR_INSTALL_TARGET_CMDS
 	$(INSTALL) -m 755 $(@D)/dropbearmulti $(TARGET_DIR)/usr/sbin/dropbear
 	for f in $(DROPBEAR_TARGET_BINS); do \
 		ln -snf ../sbin/dropbear $(TARGET_DIR)/usr/bin/$$f ; \
 	done
-	if [ ! -f $(TARGET_DIR)/etc/init.d/S50dropbear ]; then \
-		$(INSTALL) -m 0755 -D package/dropbear/S50dropbear $(TARGET_DIR)/etc/init.d/S50dropbear; \
-	fi
-endef
-
-define DROPBEAR_UNINSTALL_TARGET_CMDS
-	rm -f $(TARGET_DIR)/usr/sbin/dropbear
-	rm -f $(addprefix $(TARGET_DIR)/usr/bin/, $(DROPBEAR_TARGET_BINS))
-	rm -f $(TARGET_DIR)/etc/init.d/S50dropbear
+	ln -snf /var/run/dropbear $(TARGET_DIR)/etc/dropbear
 endef
 
 $(eval $(autotools-package))

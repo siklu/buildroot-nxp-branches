@@ -1,41 +1,26 @@
-#############################################################
+################################################################################
 #
 # lcdapi
 #
-#############################################################
-LCDAPI_VERSION = v0.4
-LCDAPI_SITE = http://github.com/spdawson/lcdapi/tarball/$(LCDAPI_VERSION)
-LCDAPI_LICENSE = LGPLv2.1+
-LCDAPI_LICENSE_FILES = COPYING
+################################################################################
 
+LCDAPI_VERSION = v0.11
+LCDAPI_SITE = $(call github,spdawson,lcdapi,$(LCDAPI_VERSION))
+LCDAPI_LICENSE = LGPL-2.1+
+LCDAPI_LICENSE_FILES = COPYING
+LCDAPI_AUTORECONF = YES
 LCDAPI_INSTALL_STAGING = YES
 
-define LCDAPI_BUILD_CMDS
-	$(TARGET_MAKE_ENV) $(MAKE) $(TARGET_CONFIGURE_OPTS) -C $(@D)
+# Internal error, aborting at dw2gencfi.c:214 in emit_expr_encoded
+# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79509
+ifeq ($(BR2_m68k_cf),y)
+LCDAPI_CONF_OPTS += CXXFLAGS="$(TARGET_CXXFLAGS) -fno-dwarf2-cfi-asm"
+endif
+
+define LCDAPI_CREATE_M4_DIR
+	mkdir -p $(@D)/m4
 endef
 
-define LCDAPI_INSTALL_STAGING_CMDS
-	$(TARGET_MAKE_ENV) $(MAKE) $(TARGET_CONFIGURE_OPTS) -C $(@D) \
-		DESTDIR="$(STAGING_DIR)" install
-endef
+LCDAPI_POST_PATCH_HOOKS += LCDAPI_CREATE_M4_DIR
 
-define LCDAPI_INSTALL_TARGET_CMDS
-	$(TARGET_MAKE_ENV) $(MAKE) $(TARGET_CONFIGURE_OPTS) -C $(@D) \
-		DESTDIR="$(TARGET_DIR)" install
-endef
-
-define LCDAPI_UNINSTALL_STAGING_CMDS
-	$(TARGET_MAKE_ENV) $(MAKE) $(TARGET_CONFIGURE_OPTS) -C $(@D) \
-		DESTDIR="$(STAGING_DIR)" uninstall
-endef
-
-define LCDAPI_UNINSTALL_TARGET_CMDS
-	$(TARGET_MAKE_ENV) $(MAKE) $(TARGET_CONFIGURE_OPTS) -C $(@D) \
-		DESTDIR="$(TARGET_DIR)" uninstall
-endef
-
-define LCDAPI_CLEAN_CMDS
-	$(TARGET_MAKE_ENV) $(MAKE) $(TARGET_CONFIGURE_OPTS) -C $(@D) clean
-endef
-
-$(eval $(generic-package))
+$(eval $(autotools-package))

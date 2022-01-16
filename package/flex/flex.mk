@@ -1,36 +1,29 @@
-#############################################################
+################################################################################
 #
 # flex
 #
-#############################################################
+################################################################################
 
-FLEX_VERSION = 2.5.35
-FLEX_PATCH_VERSION = 10
-FLEX_SOURCE = flex_$(FLEX_VERSION).orig.tar.gz
-FLEX_PATCH = flex_$(FLEX_VERSION)-$(FLEX_PATCH_VERSION).diff.gz
-FLEX_SITE = $(BR2_DEBIAN_MIRROR)/debian/pool/main/f/flex
-FLEX_DIR = $(BUILD_DIR)/flex-$(FLEX_VERSION)
+FLEX_VERSION = 2.6.4
+#FLEX_SITE = https://github.com/westes/flex/files/981163
+FLEX_SITE = $(BR2_SIKLU_FTP_URL)
 FLEX_INSTALL_STAGING = YES
-FLEX_DEPENDENCIES = \
-	$(if $(BR2_PACKAGE_GETTEXT),gettext)
-# we don't have a host-gettext/libintl
-HOST_FLEX_DEPENDENCIES =
-
-ifeq ($(BR2_PACKAGE_FLEX_BINARY),y)
-# lex -> flex
-define FLEX_INSTALL_LEX
-	cd $(TARGET_DIR)/usr/bin && ln -snf flex lex
-endef
-FLEX_POST_INSTALL_HOOKS += FLEX_INSTALL_LEX
-
-else
+FLEX_LICENSE = FLEX
+FLEX_LICENSE_FILES = COPYING
+FLEX_DEPENDENCIES = $(TARGET_NLS_DEPENDENCIES) host-m4
+FLEX_CONF_ENV = ac_cv_path_M4=/usr/bin/m4
+HOST_FLEX_DEPENDENCIES = host-m4
 
 define FLEX_DISABLE_PROGRAM
-	$(SED) 's/^bin_PROGRAMS.*//' $(@D)/Makefile.in
+	$(SED) 's/^bin_PROGRAMS.*//' $(@D)/src/Makefile.in
 endef
 FLEX_POST_PATCH_HOOKS += FLEX_DISABLE_PROGRAM
 
-endif
+# flex++ symlink is broken when flex binary is not installed
+define FLEX_REMOVE_BROKEN_SYMLINK
+	rm -f $(TARGET_DIR)/usr/bin/flex++
+endef
+FLEX_POST_INSTALL_TARGET_HOOKS += FLEX_REMOVE_BROKEN_SYMLINK
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))

@@ -1,44 +1,34 @@
-#############################################################
+################################################################################
 #
 # midori
 #
-#############################################################
+################################################################################
 
-MIDORI_VERSION = 0.4.6
-MIDORI_SOURCE = midori-$(MIDORI_VERSION).tar.bz2
-MIDORI_SITE = http://archive.xfce.org/src/apps/midori/0.4/
+MIDORI_VERSION = 0.5.11
+MIDORI_SOURCE = midori_$(MIDORI_VERSION)_all_.tar.bz2
+MIDORI_SITE = http://midori-browser.org/downloads
+MIDORI_LICENSE = LGPL-2.1+
+MIDORI_LICENSE_FILES = COPYING
 MIDORI_DEPENDENCIES = \
 	host-intltool \
+	host-librsvg \
 	host-pkgconf \
 	host-vala \
-	libgtk2 \
-	libsexy \
-	webkit \
-	$(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),gettext) \
+	host-python \
+	$(if $(BR2_PACKAGE_LIBGTK3_X11),gcr) \
+	granite \
+	libgtk3 \
+	libsoup \
+	libxml2 \
+	sqlite \
+	webkitgtk \
+	$(TARGET_NLS_DEPENDENCIES) \
 	$(if $(BR2_PACKAGE_LIBICONV),libiconv)
 
-ifneq ($(BR2_PACKAGE_XORG7),y)
-define MIDORI_WITHOUT_X11
-	$(SED) "s/check_pkg ('x11')/#check_pkg ('x11')/" $(@D)/wscript
-endef
-endif
+MIDORI_CONF_OPTS = \
+	-DHALF_BRO_INCOM_WEBKIT2=ON \
+	-DUSE_GRANITE=ON \
+	-DUSE_GTK3=ON \
+	-DUSE_ZEITGEIST=OFF
 
-define MIDORI_CONFIGURE_CMDS
-	$(MIDORI_WITHOUT_X11)
-	(cd $(@D); \
-		$(TARGET_CONFIGURE_OPTS)	\
-		./waf configure			\
-		--prefix=/usr			\
-		--disable-libnotify		\
-       )
-endef
-
-define MIDORI_BUILD_CMDS
-       (cd $(@D); ./waf build -j $(PARALLEL_JOBS))
-endef
-
-define MIDORI_INSTALL_TARGET_CMDS
-       (cd $(@D); ./waf --destdir=$(TARGET_DIR) install)
-endef
-
-$(eval $(generic-package))
+$(eval $(cmake-package))

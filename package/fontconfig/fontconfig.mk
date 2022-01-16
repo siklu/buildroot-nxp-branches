@@ -1,31 +1,29 @@
-#############################################################
+################################################################################
 #
 # fontconfig
 #
-#############################################################
-FONTCONFIG_VERSION = 2.6.0
-FONTCONFIG_SOURCE = fontconfig-$(FONTCONFIG_VERSION).tar.gz
+################################################################################
+
+FONTCONFIG_VERSION = 2.12.1
 FONTCONFIG_SITE = http://fontconfig.org/release
+FONTCONFIG_SOURCE = fontconfig-$(FONTCONFIG_VERSION).tar.bz2
+FONTCONFIG_INSTALL_STAGING = YES
+
+# When
+# 0001-Avoid-conflicts-with-integer-width-macros-from-TS-1866.patch is
+# removed, the host-gperf dependency should be removed.
+FONTCONFIG_DEPENDENCIES = freetype expat host-pkgconf host-gperf
+HOST_FONTCONFIG_DEPENDENCIES = host-freetype host-expat host-pkgconf host-gperf
 FONTCONFIG_LICENSE = fontconfig license
 FONTCONFIG_LICENSE_FILES = COPYING
-FONTCONFIG_AUTORECONF = YES
-FONTCONFIG_INSTALL_STAGING = YES
-# This package does not like using the target cflags for some reason.
-FONTCONFIG_CONF_ENV = CFLAGS="-I$(STAGING_DIR)/usr/include/freetype2"
 
-FONTCONFIG_CONF_OPT = --with-arch=$(GNU_TARGET_NAME) \
-		--with-freetype-config="$(STAGING_DIR)/usr/bin/freetype-config" \
-		--with-cache-dir=/var/cache/fontconfig \
-		--with-expat="$(STAGING_DIR)/usr/lib" \
-		--with-expat-lib=$(STAGING_DIR)/usr/lib \
-		--with-expat-includes=$(STAGING_DIR)/usr/include \
-		--disable-docs
+FONTCONFIG_CONF_OPTS = \
+	--with-arch=$(GNU_TARGET_NAME) \
+	--with-cache-dir=/var/cache/fontconfig \
+	--disable-docs
 
-FONTCONFIG_DEPENDENCIES = freetype expat
-
-HOST_FONTCONFIG_CONF_OPT = \
-		--disable-docs \
-		--disable-static
+HOST_FONTCONFIG_CONF_OPTS = \
+	--disable-static
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))

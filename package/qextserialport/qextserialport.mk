@@ -1,37 +1,45 @@
-#############################################################
+################################################################################
 #
 # qextserialport
 #
-#############################################################
+################################################################################
 
-QEXTSERIALPORT_VERSION     = f83b4e7ca922e53
-QEXTSERIALPORT_SITE        = https://qextserialport.googlecode.com/git/
-QEXTSERIALPORT_SITE_METHOD = git
-
+QEXTSERIALPORT_VERSION = ada321a9ee463f628e7b781b8ed00ff219152158
+QEXTSERIALPORT_SITE = $(call github,qextserialport,qextserialport,$(QEXTSERIALPORT_VERSION))
 QEXTSERIALPORT_LICENSE = MIT
-
-QEXTSERIALPORT_DEPENDENCIES = qt
-
+QEXTSERIALPORT_LICENSE_FILES = LICENSE.md
 QEXTSERIALPORT_INSTALL_STAGING = YES
 
+ifeq ($(BR2_STATIC_LIBS),y)
+QEXTSERIALPORT_CONF_OPTS += CONFIG+=qesp_static
+endif
+
+ifeq ($(BR2_PACKAGE_QT),y)
+QEXTSERIALPORT_DEPENDENCIES += qt
+QEXTSERIALPORT_QMAKE = $(QT_QMAKE)
+else ifeq ($(BR2_PACKAGE_QT5),y)
+QEXTSERIALPORT_DEPENDENCIES += qt5base
+QEXTSERIALPORT_QMAKE = $(QT5_QMAKE)
+endif
+
 define QEXTSERIALPORT_CONFIGURE_CMDS
-	(cd $(@D); $(QT_QMAKE))
+	cd $(@D); $(TARGET_MAKE_ENV) $(QEXTSERIALPORT_QMAKE) $(QEXTSERIALPORT_CONF_OPTS)
 endef
 
 define QEXTSERIALPORT_BUILD_CMDS
-	$(MAKE) -C $(@D)
+	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D)
 endef
 
 define QEXTSERIALPORT_INSTALL_STAGING_CMDS
-	mkdir -p $(STAGING_DIR)/usr/include/QExtSerialPort
-	cp $(@D)/src/*.h $(STAGING_DIR)/usr/include/QExtSerialPort/
-	cp $(@D)/src/QExtSerialPort $(STAGING_DIR)/usr/include/QExtSerialPort/
-	cp -a $(@D)/*.so* $(STAGING_DIR)/usr/lib/
-	cp $(@D)/qextserialport.pc $(STAGING_DIR)/usr/lib/pkgconfig/
+	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D) install
 endef
 
+ifeq ($(BR2_STATIC_LIBS),y)
+QEXTSERIALPORT_INSTALL_TARGET = NO
+else
 define QEXTSERIALPORT_INSTALL_TARGET_CMDS
 	cp -a $(@D)/*.so.* $(TARGET_DIR)/usr/lib
 endef
+endif
 
 $(eval $(generic-package))

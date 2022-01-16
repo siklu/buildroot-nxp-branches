@@ -1,21 +1,18 @@
-#############################################################
+################################################################################
 #
 # axel
 #
-#############################################################
+################################################################################
+
 AXEL_VERSION = 2.4
-AXEL_SOURCE = axel-$(AXEL_VERSION).tar.gz
-AXEL_SITE = https://alioth.debian.org/frs/download.php/3015
+AXEL_SITE = http://sources.buildroot.net
+AXEL_LICENSE = GPL-2.0+
+AXEL_LICENSE_FILES = COPYING
+AXEL_DEPENDENCIES = $(TARGET_NLS_DEPENDENCIES)
+AXEL_LDFLAGS = -lpthread $(TARGET_NLS_LIBS)
 
-AXEL_LDFLAGS = -lpthread
-
-ifeq ($(BR2_NEEDS_GETTEXT_IF_LOCALE),y)
-AXEL_DEPENDENCIES += gettext
-AXEL_LDFLAGS += -lintl
-endif
-
-ifneq ($(BR2_ENABLE_LOCALE),y)
-AXEL_DISABLE_I18N=--i18n=0
+ifeq ($(BR2_SYSTEM_ENABLE_NLS),)
+AXEL_DISABLE_I18N = --i18n=0
 endif
 
 define AXEL_CONFIGURE_CMDS
@@ -28,20 +25,12 @@ define AXEL_CONFIGURE_CMDS
 endef
 
 define AXEL_BUILD_CMDS
-	$(MAKE) CC="$(TARGET_CC)" CFLAGS="$(TARGET_CFLAGS)" \
+	$(TARGET_MAKE_ENV) $(MAKE) CC="$(TARGET_CC)" CFLAGS="$(TARGET_CFLAGS)" \
 	LFLAGS="$(TARGET_LDFLAGS) $(AXEL_LDFLAGS)" -C $(@D)
 endef
 
 define AXEL_INSTALL_TARGET_CMDS
-	$(MAKE) DESTDIR=$(TARGET_DIR) -C $(@D) install
-endef
-
-define AXEL_UNINSTALL_TARGET_CMDS
-	$(MAKE) DESTDIR=$(TARGET_DIR) -C $(@D) uninstall
-endef
-
-define AXEL_CLEAN_CMDS
-	-$(MAKE) -C $(@D) clean
+	$(TARGET_MAKE_ENV) $(MAKE) DESTDIR=$(TARGET_DIR) -C $(@D) install
 endef
 
 $(eval $(generic-package))

@@ -1,0 +1,401 @@
+diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/cli-kex.c dropbear-2018.76_patched/cli-kex.c
+--- dropbear-2018.76_before_patch/cli-kex.c	2018-02-27 16:25:10.000000000 +0200
++++ dropbear-2018.76_patched/cli-kex.c	2021-12-21 12:58:31.936942851 +0200
+@@ -232,7 +232,7 @@
+ 
+ 	if (!homedir) {
+ 		struct passwd * pw = NULL;
+-		pw = getpwuid(getuid());
++		pw = _getpwuid(getuid()); // Siklu
+ 		if (pw) {
+ 			homedir = pw->pw_dir;
+ 		}
+diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/cli-runopts.c dropbear-2018.76_patched/cli-runopts.c
+--- dropbear-2018.76_before_patch/cli-runopts.c	2018-02-27 16:25:10.000000000 +0200
++++ dropbear-2018.76_patched/cli-runopts.c	2021-12-21 12:58:31.936942851 +0200
+@@ -733,7 +733,7 @@
+ 
+ 	uid = getuid();
+ 
+-	pw = getpwuid(uid);
++	pw = _getpwuid(uid); // Siklu
+ 	if (pw && pw->pw_name != NULL) {
+ 		cli_opts.own_user = m_strdup(pw->pw_name);
+ 	} else {
+diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/common-session.c dropbear-2018.76_patched/common-session.c
+--- dropbear-2018.76_before_patch/common-session.c	2018-02-27 16:25:10.000000000 +0200
++++ dropbear-2018.76_patched/common-session.c	2021-12-21 12:58:31.936942851 +0200
+@@ -586,7 +586,7 @@
+ 	if (ses.authstate.pw_passwd)
+ 		m_free(ses.authstate.pw_passwd);
+ 
+-	pw = getpwnam(username);
++	pw = _getpwnam(username); // Siklu
+ 	if (!pw) {
+ 		return;
+ 	}
+diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/dbutil.c dropbear-2018.76_patched/dbutil.c
+--- dropbear-2018.76_before_patch/dbutil.c	2018-02-27 16:25:10.000000000 +0200
++++ dropbear-2018.76_patched/dbutil.c	2021-12-21 12:58:31.936942851 +0200
+@@ -603,7 +603,7 @@
+ char * expand_homedir_path(const char *inpath) {
+ 	struct passwd *pw = NULL;
+ 	if (inpath[0] != '/') {
+-		pw = getpwuid(getuid());
++		pw = _getpwuid(getuid()); // Siklu
+ 		if (pw && pw->pw_dir) {
+ 			int len = strlen(inpath) + strlen(pw->pw_dir) + 2;
+ 			char *buf = m_malloc(len);
+diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/default_options.h dropbear-2018.76_patched/default_options.h
+--- dropbear-2018.76_before_patch/default_options.h	2018-02-27 16:25:10.000000000 +0200
++++ dropbear-2018.76_patched/default_options.h	2021-12-21 13:55:22.973929761 +0200
+@@ -178,16 +178,18 @@
+ #define MOTD_FILENAME "/etc/motd"
+ 
+ /* Authentication Types - at least one required.
+-   RFC Draft requires pubkey auth, and recommends password */
+-#define DROPBEAR_SVR_PASSWORD_AUTH 1
++   RFC Draft requires pubkey auth, and recommends password 
++   Siklu - changed to '0' */
++#define DROPBEAR_SVR_PASSWORD_AUTH 0
+ 
+ /* Note: PAM auth is quite simple and only works for PAM modules which just do
+  * a simple "Login: " "Password: " (you can edit the strings in svr-authpam.c).
+  * It's useful for systems like OS X where standard password crypts don't work
+  * but there's an interface via a PAM module. It won't work for more complex
+  * PAM challenge/response.
+- * You can't enable both PASSWORD and PAM. */
+-#define DROPBEAR_SVR_PAM_AUTH 0
++ * You can't enable both PASSWORD and PAM. 
++  Siklu - changed to '1' */
++#define DROPBEAR_SVR_PAM_AUTH 1
+ 
+ /* ~/.ssh/authorized_keys authentication */
+ #define DROPBEAR_SVR_PUBKEY_AUTH 1
+@@ -231,7 +233,7 @@
+ 
+ /* And then a global limit to avoid chewing memory if connections 
+  * come from many IPs */
+-#define MAX_UNAUTH_CLIENTS 30
++#define MAX_UNAUTH_CLIENTS 10 /*Siklu was 30*/
+ 
+ /* Default maximum number of failed authentication tries (server option) */
+ /* -T server option overrides */
+diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/dropbearkey.c dropbear-2018.76_patched/dropbearkey.c
+--- dropbear-2018.76_before_patch/dropbearkey.c	2018-02-27 16:25:10.000000000 +0200
++++ dropbear-2018.76_patched/dropbearkey.c	2021-12-21 12:58:31.936942851 +0200
+@@ -326,7 +326,7 @@
+ 
+ 	/* a user@host comment is informative */
+ 	username = "";
+-	pw = getpwuid(getuid());
++	pw = _getpwuid(getuid()); // Siklu
+ 	if (pw) {
+ 		username = pw->pw_name;
+ 	}
+diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/includes.h dropbear-2018.76_patched/includes.h
+--- dropbear-2018.76_before_patch/includes.h	2018-02-27 16:25:10.000000000 +0200
++++ dropbear-2018.76_patched/includes.h	2021-12-21 12:58:31.936942851 +0200
+@@ -56,6 +56,7 @@
+ #include <stdarg.h>
+ #include <dirent.h>
+ #include <time.h>
++#include "siklu_pwd.h"   // Siklu
+ 
+ #ifdef HAVE_UTMP_H
+ #include <utmp.h>
+diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/loginrec.c dropbear-2018.76_patched/loginrec.c
+--- dropbear-2018.76_before_patch/loginrec.c	2018-02-27 16:25:12.000000000 +0200
++++ dropbear-2018.76_patched/loginrec.c	2021-12-21 12:58:31.936942851 +0200
+@@ -275,7 +275,7 @@
+ 
+ 	if (username) {
+ 		strlcpy(li->username, username, sizeof(li->username));
+-		pw = getpwnam(li->username);
++		pw = _getpwnam(li->username); // Siklu
+ 		if (pw == NULL)
+ 			dropbear_exit("login_init_entry: Cannot find user \"%s\"",
+ 					li->username);
+diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/siklu_dropbear.c dropbear-2018.76_patched/siklu_dropbear.c
+--- dropbear-2018.76_before_patch/siklu_dropbear.c	1970-01-01 02:00:00.000000000 +0200
++++ dropbear-2018.76_patched/siklu_dropbear.c	2021-12-21 12:58:31.936942851 +0200
+@@ -0,0 +1,153 @@
++/*
++ * siklu_dropbear.c
++ *
++ *  Created on: Jun 26, 2014
++ *      Author: edwardk
++ *
++ *
++ Follow method operates on original /etc/passwd and /etc/shadow files
++ siklu_getpwnam_passwd_file(name). It works.
++ *
++
++ *
++ */
++
++#include "includes.h"
++#include "session.h"
++#include "dbutil.h"
++#include "packet.h"
++#include "algo.h"
++#include "buffer.h"
++#include "dss.h"
++#include "ssh.h"
++
++#include <stddef.h>
++#include <sys/types.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <pwd.h>
++#include <syslog.h>
++#include <unistd.h>
++#include <time.h>
++
++// #define PAM_DEBUG
++#undef PAM_DEBUG
++
++#ifdef PAM_DEBUG
++# define debugp syslog
++#else
++# define debugp(fmt, a...)
++#endif
++
++#define MAX_TEMP_BUFFER		128
++#define MAX_CRYPTED_PASS	128
++
++typedef enum { // declares linux groups. see /etc/groups file
++	E_USER_TYPE_DEBUG = 0, /* This is real superuser (root) */
++	E_USER_TYPE_USER = 1000,
++	E_USER_TYPE_TECH,
++	E_USER_TYPE_SUPER,
++	E_USER_TYPE_ADMIN = 1100,
++	E_USER_TYPE_REMOTE_AUTH = 1200,
++// tacacs AAA user
++} T_USER_TYPE; // copied from CaExternal.h
++
++static int pw_uid = 800; // base for all new user's ID
++
++static int PAM_GenerateRandomUserPassword(int passw_len, char* passw) //
++{
++	int i;
++
++	static const char alphanum[] = "0123456789"
++			"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
++			"abcdefghijklmnopqrstuvwxyz";
++	srand(time(NULL));
++	for (i = 0; i < passw_len; ++i) //
++			{
++		passw[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
++	}
++
++	passw[passw_len] = 0;
++	debugp(LOG_NOTICE, "%s() Generated passw %s\n", __func__, passw);
++	return 0;
++
++}
++
++#define   MAX_USER_PASS	16
++
++/*
++ * Check if user already defined in process environment area
++ * 		if yes, fill passwd struct by user parameters
++ * 		if not generate user params in an environment
++ *
++ *
++ *
++ */
++static struct passwd *siklu_getpwnam_virtual_user(const char *name) //
++{
++	static struct passwd ret;
++	char temp[MAX_USER_PASS];
++	char* env_user_name = getenv("V_USER");
++	if (env_user_name == NULL) {
++		// generate environment variables
++
++		PAM_GenerateRandomUserPassword(MAX_USER_PASS - 1, temp);
++		setenv("V_USER", name, 1);
++		setenv("V_PASSWD", temp, 1);
++		setenv("V_DIR", "/home/sw", 1);
++		setenv("V_SHELL", "/home/sw/bin/cli", 1);
++
++	}
++
++	ret.pw_name = getenv("V_USER");
++	ret.pw_passwd = getenv("V_PASSWD");
++	ret.pw_uid = 900;
++
++	ret.pw_gid = E_USER_TYPE_REMOTE_AUTH;
++	ret.pw_gecos = getenv("V_USER");
++	ret.pw_dir = getenv("V_DIR");
++	ret.pw_shell = getenv("V_SHELL");
++
++	return (struct passwd *) &ret;
++
++}
++
++// ====================   Global functions ==================================
++
++struct passwd *_getpwnam(const char *name) {
++	struct passwd *ret = NULL;
++
++	ret = getpwnam(name);
++	debugp(LOG_NOTICE, "%s() called for user %s, ret val %p, process ID %d",
++			__func__, name, ret, getpid());
++	if (ret != NULL) { // user registered in /etc/passwd
++		debugp(LOG_NOTICE, " User \"%s\" exists in /etc/passwd", name);
++	} else {
++		debugp(LOG_NOTICE, " Add User %s to a system", name);
++		ret = siklu_getpwnam_virtual_user(name); // (see remarks in file header)
++	} //
++	debugp(LOG_NOTICE, "pw_name \"%s\", pw_passwd \"%s\", pw_uid %d, pw_gid %d",
++			ret->pw_name, ret->pw_passwd, ret->pw_uid, ret->pw_gid);debugp(LOG_NOTICE, "pw_gecos \"%s\", pw_dir \"%s\", pw_shell \"%s\"",
++			ret->pw_gecos, ret->pw_dir, ret->pw_shell);
++	return ret;
++}
++
++/*
++ *
++ *
++ */
++struct passwd *_getpwuid(uid_t uid) {
++	struct passwd *ret;
++	ret = getpwuid(uid);
++
++	if (uid != 0) {// the function called by scp request. only root allowed execute it
++		syslog(LOG_ERR, "%s   %s() The function should not be called! uid %d, ret %p", __FILE__, __func__, uid, ret);
++	}
++	if (ret != NULL) { // edikk remove after debug
++		debugp(LOG_NOTICE, "pw_name %s, pw_passwd %s, pw_uid %d, pw_gid %d",
++				ret->pw_name, ret->pw_passwd, ret->pw_uid, ret->pw_gid);debugp(LOG_NOTICE, "pw_gecos %s, pw_dir %s, pw_shell %s", ret->pw_gecos,
++				ret->pw_dir, ret->pw_shell);
++	}
++	return ret;
++}
+diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/siklu_pwd.h dropbear-2018.76_patched/siklu_pwd.h
+--- dropbear-2018.76_before_patch/siklu_pwd.h	1970-01-01 02:00:00.000000000 +0200
++++ dropbear-2018.76_patched/siklu_pwd.h	2021-12-21 12:58:31.940942942 +0200
+@@ -0,0 +1,31 @@
++/*
++ * siklu_pwd.h
++ *
++ *  Created on: Jun 26, 2014
++ *      Author: edwardk
++ */
++
++#ifndef SIKLU_PWD_H_
++#define SIKLU_PWD_H_
++
++
++/*
++ * struct passwd {
++		 char   *pw_name;       / * username * /
++		 char   *pw_passwd;     / * user password * /
++		 uid_t   pw_uid;        / * user ID * /
++		 gid_t   pw_gid;        / * group ID * /
++		 char   *pw_gecos;      / * user information * /
++		 char   *pw_dir;        / * home directory * /
++		 char   *pw_shell;      / * shell program * /
++		 };
++*/
++
++
++extern struct passwd *_getpwnam(const char *name);
++
++extern struct passwd *_getpwuid(uid_t uid);
++
++
++
++#endif /* SIKLU_PWD_H_ */
+diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/svr-authpam.c dropbear-2018.76_patched/svr-authpam.c
+--- dropbear-2018.76_before_patch/svr-authpam.c	2018-02-27 16:25:12.000000000 +0200
++++ dropbear-2018.76_patched/svr-authpam.c	2021-12-21 12:58:31.940942942 +0200
+@@ -238,9 +238,10 @@
+ 	/* (void) pam_set_item(pamHandlep, PAM_FAIL_DELAY, (void*) pamDelayFunc); */
+ 
+ 	if ((rc = pam_authenticate(pamHandlep, 0)) != PAM_SUCCESS) {
+-		dropbear_log(LOG_WARNING, "pam_authenticate() failed, rc=%d, %s", 
++		// Siklu In log below LOG_WARNING replaced by LOG_NOTICE
++		dropbear_log(LOG_NOTICE, "pam_authenticate() failed, rc=%d, %s", 
+ 				rc, pam_strerror(pamHandlep, rc));
+-		dropbear_log(LOG_WARNING,
++		dropbear_log(LOG_NOTICE,
+ 				"Bad PAM password attempt for '%s' from %s",
+ 				ses.authstate.pw_name,
+ 				svr_ses.addrstring);
+@@ -249,15 +250,38 @@
+ 	}
+ 
+ 	if ((rc = pam_acct_mgmt(pamHandlep, 0)) != PAM_SUCCESS) {
+-		dropbear_log(LOG_WARNING, "pam_acct_mgmt() failed, rc=%d, %s", 
++		// Siklu In log below LOG_WARNING replaced by LOG_NOTICE
++		dropbear_log(LOG_NOTICE, "pam_acct_mgmt() failed, rc=%d, %s", 
+ 				rc, pam_strerror(pamHandlep, rc));
+-		dropbear_log(LOG_WARNING,
++		dropbear_log(LOG_NOTICE,
+ 				"Bad PAM password attempt for '%s' from %s",
+ 				ses.authstate.pw_name,
+ 				svr_ses.addrstring);
+ 		send_msg_userauth_failure(0, 1);
+ 		goto cleanup;
+ 	}
++	
++	// ========================== Siklu addition start ===========================
++	char **pam_envlist, **pam_env;
++	// store/export PAM environment in a process environment
++	// create also file in /tmp/web-auth/<user_name> and write pam env variables to the file
++
++	dropbear_log(LOG_NOTICE,"%s() process pid %d, parrent pid %d", __func__,   getpid(),  getppid());
++	if ((pam_envlist = pam_getenvlist(pamHandlep)) != NULL) {  // Siklu
++		for (pam_env = pam_envlist; *pam_env != NULL; ++pam_env) {
++			int rc;
++
++			char* p = strstr(*pam_env, "=");
++			if (p != NULL) {
++				*p = 0;
++				rc = setenv(*pam_env, ++p, 1);
++				dropbear_log(LOG_NOTICE,"%s() current PAM environment - %s, val %s, rc - %d",	__func__, *pam_env, p, rc);
++				free(*pam_env);
++			}
++		}
++		free(pam_envlist);
++	}
++	// ========================== siklu addition end  ===========================
+ 
+ 	/* successful authentication */
+ 	dropbear_log(LOG_NOTICE, "PAM password auth succeeded for '%s' from %s",
+diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/svr-chansession.c dropbear-2018.76_patched/svr-chansession.c
+--- dropbear-2018.76_before_patch/svr-chansession.c	2018-02-27 16:25:12.000000000 +0200
++++ dropbear-2018.76_patched/svr-chansession.c	2021-12-21 12:58:31.940942942 +0200
+@@ -593,7 +593,7 @@
+ 		dropbear_exit("Out of memory"); /* TODO disconnect */
+ 	}
+ 
+-	pw = getpwnam(ses.authstate.pw_name);
++	pw = _getpwnam(ses.authstate.pw_name); // Siklu
+ 	if (!pw)
+ 		dropbear_exit("getpwnam failed after succeeding previously");
+ 	pty_setowner(pw, chansess->tty);
+@@ -923,7 +923,8 @@
+ 	 * etc. This is hazardous, so should only be used for debugging. */
+ #ifndef DEBUG_VALGRIND
+ #ifdef HAVE_CLEARENV
+-	clearenv();
++	// clearenv();   // Siklu do not clear environment here. we need to relay all environment as-is
++	// 		with environment received from remote tacacs server to our cli application
+ #else /* don't HAVE_CLEARENV */
+ 	/* Yay for posix. */
+ 	if (environ) {
+diff -uNr -x '*.log' -x '*.sta*' -x '.p*' -x 'Makefile*' dropbear-2018.76_before_patch/sysoptions.h dropbear-2018.76_patched/sysoptions.h
+--- dropbear-2018.76_before_patch/sysoptions.h	2018-02-27 16:25:12.000000000 +0200
++++ dropbear-2018.76_patched/sysoptions.h	2021-12-21 13:54:28.240688223 +0200
+@@ -173,7 +173,7 @@
+ 								RECV_WINDOWEXTEND bytes */
+ #define MAX_RECV_WINDOW (1024*1024) /* 1 MB should be enough */
+ 
+-#define MAX_CHANNELS 1000 /* simple mem restriction, includes each tcp/x11
++#define MAX_CHANNELS 10/*Siklu, was 1000*/ /* simple mem restriction, includes each tcp/x11
+ 							connection, so can't be _too_ small */
+ 
+ #define MAX_STRING_LEN (MAX(MAX_CMD_LEN, 2400)) /* Sun SSH needs 2400 for algos,

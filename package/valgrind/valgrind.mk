@@ -1,29 +1,56 @@
-#############################################################
+################################################################################
 #
 # valgrind
 #
-#############################################################
+################################################################################
 
-VALGRIND_VERSION = 3.7.0
-VALGRIND_SITE    = http://valgrind.org/downloads/
-VALGRIND_SOURCE  = valgrind-$(VALGRIND_VERSION).tar.bz2
-VALGRIND_LICENSE = GPLv2 GFDLv1.2
+VALGRIND_VERSION = 3.12.0
+VALGRIND_SITE = http://valgrind.org/downloads
+VALGRIND_SOURCE = valgrind-$(VALGRIND_VERSION).tar.bz2
+VALGRIND_LICENSE = GPL-2.0, GFDL-1.2
 VALGRIND_LICENSE_FILES = COPYING COPYING.DOCS
+VALGRIND_CONF_OPTS = \
+	--disable-ubsan \
+	--without-mpicc
+VALGRIND_INSTALL_STAGING = YES
 
-VALGRIND_CONF_OPT = --disable-tls
+# patch 0004-Fixes-for-musl-libc.patch touching configure.ac
+VALGRIND_AUTORECONF = YES
+
+# Valgrind must be compiled with no stack protection, so forcefully
+# pass -fno-stack-protector to override what Buildroot may have in
+# TARGET_CFLAGS if BR2_SSP_* support is enabled.
+VALGRIND_CFLAGS = \
+	$(TARGET_CFLAGS) \
+	-fno-stack-protector
+
+# When Valgrind detects a 32-bit MIPS architecture, it forcibly adds
+# -march=mips32 to CFLAGS; when it detects a 64-bit MIPS architecture,
+# it forcibly adds -march=mips64. This causes Valgrind to be built
+# always for the first ISA revision level (R1), even when the user has
+# configured Buildroot for the second ISA revision level (R2).
+#
+# Override the CFLAGS variable (which Valgrind appends to its CFLAGS)
+# and pass the right -march option, so they take precedence over
+# Valgrind's wrongfully detected value.
+ifeq ($(BR2_mips)$(BR2_mipsel)$(BR2_mips64)$(BR2_mips64el),y)
+VALGRIND_CFLAGS += -march=$(BR2_GCC_TARGET_ARCH)
+endif
+
+VALGRIND_CONF_ENV = CFLAGS="$(VALGRIND_CFLAGS)"
 
 # On ARM, Valgrind only supports ARMv7, and uses the arch part of the
 # host tuple to determine whether it's being built for ARMv7 or
 # not. Therefore, we adjust the host tuple to specify we're on
 # ARMv7. The valgrind package is guaranteed, through Config.in, to
-# only be selected on Cortex A8 and Cortex A9 platforms.
-ifeq ($(BR2_cortex_a8)$(BR2_cortex_a9),y)
-VALGRIND_CONF_OPT += \
+# only be selected on ARMv7-A platforms.
+ifeq ($(BR2_ARM_CPU_ARMV7A),y)
+VALGRIND_CONF_OPTS += \
 	--host=$(patsubst arm-%,armv7-%,$(GNU_TARGET_NAME))
 endif
 
 define VALGRIND_INSTALL_UCLIBC_SUPP
-	install -D -m 0644 package/valgrind/uclibc.supp $(TARGET_DIR)/usr/lib/valgrind/uclibc.supp
+	$(INSTALL) -D -m 0644 package/valgrind/uclibc.supp $(TARGET_DIR)/usr/lib/valgrind/uclibc.supp
 endef
 
 VALGRIND_POST_INSTALL_TARGET_HOOKS += VALGRIND_INSTALL_UCLIBC_SUPP
@@ -91,12 +118,12 @@ endef
 VALGRIND_POST_INSTALL_TARGET_HOOKS += VALGRIND_REMOVE_DHAT
 endif
 
-ifeq ($(BR2_PACKAGE_VALGRIND_PTRCHECK),)
-define VALGRIND_REMOVE_PTRCHECK
-	rm -f $(TARGET_DIR)/usr/lib/valgrind/*ptrcheck*
+ifeq ($(BR2_PACKAGE_VALGRIND_SGCHECK),)
+define VALGRIND_REMOVE_SGCHECK
+	rm -f $(TARGET_DIR)/usr/lib/valgrind/*sgcheck*
 endef
 
-VALGRIND_POST_INSTALL_TARGET_HOOKS += VALGRIND_REMOVE_PTRCHECK
+VALGRIND_POST_INSTALL_TARGET_HOOKS += VALGRIND_REMOVE_SGCHECK
 endif
 
 ifeq ($(BR2_PACKAGE_VALGRIND_BBV),)

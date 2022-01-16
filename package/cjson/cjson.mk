@@ -1,44 +1,18 @@
-#############################################################
+################################################################################
 #
 # cjson
 #
-#############################################################
-CJSON_VERSION         = undefined
-CJSON_SOURCE          = cJSONFiles.zip
-CJSON_SITE            = http://downloads.sourceforge.net/project/cjson/
+################################################################################
+
+CJSON_VERSION = v1.5.6
+CJSON_SITE = $(call github,DaveGamble,cjson,$(CJSON_VERSION))
 CJSON_INSTALL_STAGING = YES
-CJSON_LICENSE         = MIT
+CJSON_LICENSE = MIT
+CJSON_LICENSE_FILES = LICENSE
+# Set ENABLE_CUSTOM_COMPILER_FLAGS to OFF in particular to disable
+# -fstack-protector-strong which depends on BR2_TOOLCHAIN_HAS_SSP
+CJSON_CONF_OPTS += \
+	-DENABLE_CJSON_TEST=OFF \
+	-DENABLE_CUSTOM_COMPILER_FLAGS=OFF
 
-define CJSON_EXTRACT_CMDS
-	unzip -d $(@D) $(DL_DIR)/$(CJSON_SOURCE)
-endef
-
-define CJSON_BUILD_CMDS
-	cd $(@D)/cJSON && $(TARGET_CC) $(TARGET_CFLAGS) -shared -fPIC cJSON.c -o libcJSON.so
-endef
-
-define CJSON_INSTALL_STAGING_CMDS
-	$(INSTALL) -D $(@D)/cJSON/cJSON.h $(STAGING_DIR)/usr/include/cJSON.h
-	$(INSTALL) -D $(@D)/cJSON/libcJSON.so $(STAGING_DIR)/usr/lib/libcJSON.so
-endef
-
-define CJSON_INSTALL_TARGET_CMDS
-	$(INSTALL) -D $(@D)/cJSON/cJSON.h $(TARGET_DIR)/usr/include/cJSON.h
-	$(INSTALL) -D $(@D)/cJSON/libcJSON.so $(TARGET_DIR)/usr/lib/libcJSON.so
-endef
-
-define CJSON_UNINSTALL_STAGING_CMDS
-	rm -f $(STAGING_DIR)/usr/include/cJSON.h
-	rm -f $(STAGING_DIR)/usr/lib/libcJSON.so
-endef
-
-define CJSON_UNINSTALL_TARGET_CMDS
-	rm -f $(TARGET_DIR)/usr/include/cJSON.h
-	rm -f $(TARGET_DIR)/usr/lib/libcJSON.so
-endef
-
-define CJSON_CLEAN_CMDS
-	cd $(@D)/cJSON && rm -f libcJSON.so
-endef
-
-$(eval $(generic-package))
+$(eval $(cmake-package))
