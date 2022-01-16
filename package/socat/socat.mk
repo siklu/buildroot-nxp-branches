@@ -6,7 +6,8 @@
 
 SOCAT_VERSION = 2.0.0-b9
 SOCAT_SOURCE = socat-$(SOCAT_VERSION).tar.bz2
-SOCAT_SITE = http://www.dest-unreach.org/socat/download
+#SOCAT_SITE = http://www.dest-unreach.org/socat/download
+SOCAT_SITE = $(BR2_SIKLU_FTP_URL)
 SOCAT_LICENSE = GPL-2.0
 SOCAT_LICENSE_FILES = COPYING
 

@@ -2,10 +2,32 @@
 #
 # dropbear
 #
+#	Siklu aplied changes:
+#	1. add macro DROPBEAR_FIX_MAKEFILE
+#	2.		DROPBEAR_POST_CONFIGURE_HOOKS
+#	2. add patch:
+# 		Patch file created by follow command:
+#			diff -uNr  dropbear-2016.74.orig dropbear-2016.74.new   -x *.log -x *.sta* -x .p*  -x Makefile* > dropbear-siklu-ver2016.74.patch
+#
+#	Check that dropbear's Makefile has line:
+#		LIBS+=-lutil -lz -lpam 
+#
+#	before generate patch file - clean all files except *.h and *.c:
+#		find . -not -name "*.c" -not -name "*.h"|xargs rm -rf
 ################################################################################
 
-DROPBEAR_VERSION = 2017.75
-DROPBEAR_SITE = http://matt.ucc.asn.au/dropbear/releases
+# - siklu replaced by same MRV version. Siklu uses in all projects version 2016.74
+#	latest buildroot version 2017.75 
+#	13 may 2018 move to version 2018.76
+# DROPBEAR_VERSION = 2016.74
+# DROPBEAR_VERSION = 2017.75  
+DROPBEAR_VERSION = 2018.76
+
+
+
+#DROPBEAR_SITE = http://matt.ucc.asn.au/dropbear/releases
+#DROPBEAR_SITE = https://matt.ucc.asn.au/dropbear/releases
+DROPBEAR_SITE = $(BR2_SIKLU_FTP_URL)
 DROPBEAR_SOURCE = dropbear-$(DROPBEAR_VERSION).tar.bz2
 DROPBEAR_LICENSE = MIT, BSD-2-Clause-like, BSD-2-Clause
 DROPBEAR_LICENSE_FILES = LICENSE
@@ -31,6 +53,17 @@ define DROPBEAR_FIX_XAUTH
 endef
 
 DROPBEAR_POST_EXTRACT_HOOKS += DROPBEAR_FIX_XAUTH
+
+define DROPBEAR_FIX_MAKEFILE
+	$(SED) 's,gensignkey.o gendss.o genrsa.o,gensignkey.o gendss.o genrsa.o siklu_dropbear.o,g' $(@D)/Makefile
+	$(SED) 's,-lutil,-lutil -lz -lpam,g' $(@D)/Makefile
+	#$(SED) 's,scpmisc.o compat.o,scpmisc.o compat.o siklu_dropbear.o,g' $(@D)/Makefile
+endef
+
+DROPBEAR_DEPENDENCIES += zlib linux-pam
+
+DROPBEAR_POST_CONFIGURE_HOOKS = DROPBEAR_FIX_MAKEFILE
+
 
 define DROPBEAR_ENABLE_REVERSE_DNS
 	$(SED) 's:.*\(#define DO_HOST_LOOKUP\).*:\1:' $(@D)/options.h
@@ -87,6 +120,10 @@ endif
 ifneq ($(BR2_PACKAGE_DROPBEAR_LASTLOG),y)
 DROPBEAR_CONF_OPTS += --disable-lastlog
 endif
+
+# siklu - enable PAM support
+DROPBEAR_CONF_OPTS += --enable-pam  --quiet
+
 
 define DROPBEAR_INSTALL_TARGET_CMDS
 	$(INSTALL) -m 755 $(@D)/dropbearmulti $(TARGET_DIR)/usr/sbin/dropbear

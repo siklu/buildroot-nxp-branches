@@ -1,0 +1,45 @@
+From 0f936b128b192cb318306283c160311acd5c0ed5 Mon Sep 17 00:00:00 2001
+From: Viacheslav Volkov <Viacheslav.Volkov@udelphi.com>
+Date: Tue, 22 Dec 2020 19:32:25 +0200
+Subject: [PATCH] Add missing stime() implementation
+
+stime() has been removed from glibc since version 2.31, so attempts to use it
+lead to linker errors: undefined reference to stime.
+
+---
+ libbb/missing_syscalls.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/libbb/missing_syscalls.c b/libbb/missing_syscalls.c
+index 0934128..700f563 100644
+--- a/libbb/missing_syscalls.c
++++ b/libbb/missing_syscalls.c
+@@ -10,12 +10,6 @@
+ #include <sys/syscall.h>
+ #include "libbb.h"
+ 
+-#if defined(ANDROID) || defined(__ANDROID__)
+-pid_t getsid(pid_t pid)
+-{
+-	return syscall(__NR_getsid, pid);
+-}
+-
+ int stime(const time_t *t)
+ {
+ 	struct timeval tv;
+@@ -24,6 +18,12 @@ int stime(const time_t *t)
+ 	return settimeofday(&tv, NULL);
+ }
+ 
++#if defined(ANDROID) || defined(__ANDROID__)
++pid_t getsid(pid_t pid)
++{
++	return syscall(__NR_getsid, pid);
++}
++
+ int sethostname(const char *name, size_t len)
+ {
+ 	return syscall(__NR_sethostname, name, len);
+-- 
+2.29.2
+

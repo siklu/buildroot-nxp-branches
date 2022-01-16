@@ -5,13 +5,16 @@
 ################################################################################
 
 LOGROTATE_VERSION = 3.11.0
-LOGROTATE_SITE = $(call github,logrotate,logrotate,$(LOGROTATE_VERSION))
+#LOGROTATE_SITE = $(call github,logrotate,logrotate,$(LOGROTATE_VERSION))
+LOGROTATE_SITE = $(BR2_SIKLU_FTP_URL)
 LOGROTATE_LICENSE = GPL-2.0+
 LOGROTATE_LICENSE_FILES = COPYING
 LOGROTATE_DEPENDENCIES = popt host-pkgconf
 # tarball does not have a generated configure script
 LOGROTATE_AUTORECONF = YES
 LOGROTATE_CONF_ENV = LIBS="`$(PKG_CONFIG_HOST_BINARY) --libs popt`"
+
+LOGROTATE_CONF_OPTS += CFLAGS="$(TARGET_CFLAGS) -fcommon"
 
 ifeq ($(BR2_PACKAGE_LIBSELINUX),y)
 LOGROTATE_CONF_OPTS += --with-selinux

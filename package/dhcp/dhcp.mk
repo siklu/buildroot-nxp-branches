@@ -5,7 +5,8 @@
 ################################################################################
 
 DHCP_VERSION = 4.3.5
-DHCP_SITE = http://ftp.isc.org/isc/dhcp/$(DHCP_VERSION)
+#DHCP_SITE = http://ftp.isc.org/isc/dhcp/$(DHCP_VERSION)
+DHCP_SITE = $(BR2_SIKLU_FTP_URL)
 DHCP_INSTALL_STAGING = YES
 DHCP_LICENSE = ISC
 DHCP_LICENSE_FILES = LICENSE
@@ -24,6 +25,8 @@ DHCP_CONF_OPTS = \
 	--with-cli6-pid-file=/var/run/dhclient6.pid \
 	--with-relay-pid-file=/var/run/dhcrelay.pid \
 	--with-relay6-pid-file=/var/run/dhcrelay6.pid
+
+DHCP_CONF_OPTS += CFLAGS="$(TARGET_CFLAGS) -fcommon"
 
 # The source for the bind libraries used by dhcp are embedded in the dhcp source
 # as a tar-ball. Extract the bind source to allow any patches to be applied

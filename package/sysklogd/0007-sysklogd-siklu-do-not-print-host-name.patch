@@ -1,0 +1,13 @@
+diff -uNr -x '*~' sysklogd-1.5.1.orig/syslogd.c sysklogd-1.5.1.new/syslogd.c
+--- sysklogd-1.5.1.orig/syslogd.c	2018-05-16 17:34:34.000000000 +0300
++++ sysklogd-1.5.1.new/syslogd.c	2018-05-16 18:42:41.000000000 +0300
+@@ -1010,7 +1010,8 @@
+ 
+ 	consfile.f_type = F_CONSOLE;
+ 	(void) strcpy(consfile.f_un.f_fname, ctty);
+-	(void) gethostname(LocalHostName, sizeof(LocalHostName));
++	// (void) gethostname(LocalHostName, sizeof(LocalHostName));
++	strcpy(LocalHostName, " "); // Copied from WIGIG project. 22/03/2018   siklu: put empty string instead local host name
+ 	LocalDomain = emptystring;
+ 	if ( (p = strchr(LocalHostName, '.')) ) {
+ 		*p++ = '\0';

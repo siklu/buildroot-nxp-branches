@@ -5,7 +5,8 @@
 ################################################################################
 
 TCPDUMP_VERSION = 4.9.1
-TCPDUMP_SITE = http://www.tcpdump.org/release
+#TCPDUMP_SITE = http://www.tcpdump.org/release
+TCPDUMP_SITE = $(BR2_SIKLU_FTP_URL)
 TCPDUMP_LICENSE = BSD-3-Clause
 TCPDUMP_LICENSE_FILES = LICENSE
 TCPDUMP_CONF_ENV = \

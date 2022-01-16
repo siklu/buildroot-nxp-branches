@@ -5,7 +5,8 @@
 ################################################################################
 
 POPT_VERSION = 1.16
-POPT_SITE = http://rpm5.org/files/popt
+#POPT_SITE = http://rpm5.org/files/popt
+POPT_SITE = $(BR2_SIKLU_FTP_URL)
 POPT_INSTALL_STAGING = YES
 POPT_LICENSE = MIT
 POPT_LICENSE_FILES = COPYING

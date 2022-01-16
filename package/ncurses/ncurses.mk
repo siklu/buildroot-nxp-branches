@@ -5,7 +5,8 @@
 ################################################################################
 
 NCURSES_VERSION = 6.0
-NCURSES_SITE = $(BR2_GNU_MIRROR)/ncurses
+#NCURSES_SITE = $(BR2_GNU_MIRROR)/ncurses
+NCURSES_SITE = $(BR2_SIKLU_FTP_URL)
 NCURSES_INSTALL_STAGING = YES
 NCURSES_DEPENDENCIES = host-ncurses
 NCURSES_LICENSE = MIT with advertising clause

@@ -6,7 +6,8 @@
 
 ACL_VERSION = 2.2.52
 ACL_SOURCE = acl-$(ACL_VERSION).src.tar.gz
-ACL_SITE = http://download.savannah.gnu.org/releases/acl
+#ACL_SITE = http://download.savannah.gnu.org/releases/acl
+ACL_SITE = $(BR2_SIKLU_FTP_URL)
 ACL_INSTALL_STAGING = YES
 ACL_DEPENDENCIES = attr
 ACL_CONF_OPTS = --enable-gettext=no

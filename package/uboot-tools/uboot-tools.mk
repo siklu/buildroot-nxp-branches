@@ -6,7 +6,8 @@
 
 UBOOT_TOOLS_VERSION = 2017.07
 UBOOT_TOOLS_SOURCE = u-boot-$(UBOOT_TOOLS_VERSION).tar.bz2
-UBOOT_TOOLS_SITE = ftp://ftp.denx.de/pub/u-boot
+#UBOOT_TOOLS_SITE = ftp://ftp.denx.de/pub/u-boot
+UBOOT_TOOLS_SITE = $(BR2_SIKLU_FTP_URL)
 UBOOT_TOOLS_LICENSE = GPL-2.0+
 UBOOT_TOOLS_LICENSE_FILES = Licenses/gpl-2.0.txt
 UBOOT_TOOLS_INSTALL_STAGING = YES
@@ -52,8 +53,12 @@ endif
 
 ifeq ($(BR2_PACKAGE_UBOOT_TOOLS_FWPRINTENV),y)
 define UBOOT_TOOLS_INSTALL_FWPRINTENV
-	$(INSTALL) -m 0755 -D $(@D)/tools/env/fw_printenv $(TARGET_DIR)/usr/sbin/fw_printenv
-	ln -sf fw_printenv $(TARGET_DIR)/usr/sbin/fw_setenv
+#	$(INSTALL) -m 0755 -D $(@D)/tools/env/fw_printenv $(TARGET_DIR)/usr/sbin/fw_printenv
+#	ln -sf fw_printenv $(TARGET_DIR)/usr/sbin/fw_setenv
+	#### siklu changed
+	mkdir -p $(TARGET_DIR)/usr/local/bin
+	$(INSTALL) -m 0755 -D $(@D)/tools/env/fw_printenv $(TARGET_DIR)/usr/local/bin/fw_printenv
+	ln -sf fw_printenv $(TARGET_DIR)/usr/local/bin/fw_setenv
 endef
 endif
 

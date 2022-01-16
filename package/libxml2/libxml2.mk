@@ -5,7 +5,8 @@
 ################################################################################
 
 LIBXML2_VERSION = 2.9.4
-LIBXML2_SITE = ftp://xmlsoft.org/libxml2
+#LIBXML2_SITE = ftp://xmlsoft.org/libxml2
+LIBXML2_SITE = $(BR2_SIKLU_FTP_URL)
 LIBXML2_INSTALL_STAGING = YES
 LIBXML2_LICENSE = MIT
 LIBXML2_LICENSE_FILES = COPYING

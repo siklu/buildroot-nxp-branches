@@ -5,7 +5,8 @@
 ################################################################################
 
 LZ4_VERSION = v1.7.5
-LZ4_SITE = $(call github,lz4,lz4,$(LZ4_VERSION))
+#LZ4_SITE = $(call github,lz4,lz4,$(LZ4_VERSION))
+LZ4_SITE = $(BR2_SIKLU_FTP_URL)
 LZ4_INSTALL_STAGING = YES
 LZ4_LICENSE = BSD-2-Clause (library), GPL-2.0+ (programs)
 LZ4_LICENSE_FILES = lib/LICENSE programs/COPYING

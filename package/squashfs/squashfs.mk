@@ -5,8 +5,10 @@
 ################################################################################
 
 SQUASHFS_VERSION = 3de1687d7432ea9b302c2db9521996f506c140a3
-SQUASHFS_SITE = https://git.kernel.org/pub/scm/fs/squashfs/squashfs-tools.git
-SQUASHFS_SITE_METHOD = git
+SQUASHFS_SOURCE = squashfs-$(SQUASHFS_VERSION).tar.gz
+#SQUASHFS_SITE = https://git.kernel.org/pub/scm/fs/squashfs/squashfs-tools.git
+SQUASHFS_SITE = $(BR2_SIKLU_FTP_URL)
+#SQUASHFS_SITE_METHOD = git
 SQUASHFS_LICENSE = GPL-2.0+
 SQUASHFS_LICENSE_FILES = COPYING
 SQUASHFS_MAKE_ARGS = XATTR_SUPPORT=1
@@ -59,7 +61,7 @@ HOST_SQUASHFS_MAKE_ARGS = \
 define SQUASHFS_BUILD_CMDS
 	$(TARGET_MAKE_ENV) $(MAKE) \
 		CC="$(TARGET_CC)" \
-		EXTRA_CFLAGS="$(TARGET_CFLAGS) -fgnu89-inline" \
+		EXTRA_CFLAGS="$(TARGET_CFLAGS) -fcommon -fgnu89-inline" \
 		EXTRA_LDFLAGS="$(TARGET_LDFLAGS)" \
 		$(SQUASHFS_MAKE_ARGS) \
 		-C $(@D)/squashfs-tools/
