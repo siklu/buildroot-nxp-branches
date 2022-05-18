@@ -16,8 +16,8 @@ export PATH=/opt/arm/gcc-arm-10.2-2020.11-x86_64-arm-none-linux-gnueabihf/bin/:$
 
 # Temporarily comment out whatever you don't need.
 #make oldconfig
-make menuconfig
-#make ARCH=arm CROSS_COMPILE=${CROSS_COMPILE}
-
-#make clean
-#make
+#make menuconfig
+#make savedefconfig
+make siklu_80X0_defconfig
+make clean
+make ARCH=arm CROSS_COMPILE=${CROSS_COMPILE}
