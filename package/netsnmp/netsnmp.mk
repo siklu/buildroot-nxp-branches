@@ -138,5 +138,23 @@ define NETSNMP_INSTALL_INIT_SYSV
 		$(TARGET_DIR)/etc/init.d/S59snmpd
 endef
 endif
+define NETSNMP_STAGING_NETSNMP_CONFIG_FIXUP
+	$(SED) "s,^prefix=.*,prefix=\'$(STAGING_DIR)/usr\',g" \
+		-e "s,^exec_prefix=.*,exec_prefix=\'$(STAGING_DIR)/usr\',g" \
+		-e "s,^includedir=.*,includedir=\'$(STAGING_DIR)/usr/include\',g" \
+		-e "s,^libdir=.*,libdir=\'$(STAGING_DIR)/usr/lib\',g" \
+		$(STAGING_DIR)/usr/bin/net-snmp-config
+endef
+
+define NETSNMP_POST_PATCH_FIXUP
+	echo " ============ Patch net-snmp-config.h file after configure ============="
+	$(SED) 's;#define STRUCT_NLIST_HAS_N_VALUE 1;/* #undef STRUCT_NLIST_HAS_N_VALUE */;g' $(@D)/include/net-snmp/net-snmp-config.h
+	$(SED) 's;#define HAVE_NLIST_H 1;/* #undef HAVE_NLIST_H */;g' $(@D)/include/net-snmp/net-snmp-config.h
+	echo " ================= DONE ================"
+endef
+
+NETSNMP_POST_CONFIGURE_HOOKS += NETSNMP_POST_PATCH_FIXUP
+
+NETSNMP_POST_INSTALL_STAGING_HOOKS += NETSNMP_STAGING_NETSNMP_CONFIG_FIXUP
 
 $(eval $(autotools-package))
