@@ -1,0 +1,81 @@
+From 6069ab55f4276f720106afad1057a0181ef78705 Mon Sep 17 00:00:00 2001
+From: Jonathan BEN-AVRAHAM <jonathan.ba@siklu.com>
+Date: Fri, 10 Jun 2022 10:47:48 +0300
+Subject: [PATCH] siklu-dropbear-2020.81-btmp
+
+---
+ svr-auth.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
+
+diff --git a/svr-auth.c b/svr-auth.c
+index 443de20..14c8661 100644
+--- a/svr-auth.c
++++ b/svr-auth.c
+@@ -341,6 +341,54 @@ goodshell:
+ 	return DROPBEAR_SUCCESS;
+ }
+ 
++# ifndef _PATH_BTMP	/* glibc should define this in paths.h */
++#  define _PATH_BTMP	"/var/log/btmp"
++# endif
++# if defined _PATH_BTMP && !defined _PATH_BTMPX
++#  define _PATH_BTMPX _PATH_BTMP
++# endif
++
++void write_new_btmp(pid_t pid, const char *tty_name, const char *username, const char *hostname)
++{
++	struct utmpx utent;
++	struct timeval tv;
++
++	char *id;
++	unsigned width;
++
++	memset(&utent, 0, sizeof(utent));
++
++	utent.ut_pid = pid;
++	utent.ut_type = LOGIN_PROCESS;  /* XXX doesn't matter */
++	// tty_name = skip_dev_pfx(tty_name);
++	strncpy(utent.ut_line, tty_name, sizeof(utent.ut_line));
++	if (username)
++		strncpy(utent.ut_user, username, sizeof(utent.ut_user));
++	if (hostname)
++		strncpy(utent.ut_host, hostname, sizeof(utent.ut_host));
++
++	gettimeofday(&tv, NULL);
++	utent.ut_tv.tv_sec = tv.tv_sec;
++	utent.ut_tv.tv_usec = tv.tv_usec;
++
++	/* Invent our own ut_id. ut_id is only 4 chars wide.
++	* Try to fit something remotely meaningful... */
++	id = utent.ut_id;
++	width = sizeof(utent.ut_id);
++	if (tty_name[0] == 'p') {
++		/* if "ptyXXX", map to "pXXX" */
++		/* if "pts/XX", map to "p/XX" */
++		*id++ = 'p';
++		width--;
++	} /* else: usually it's "ttyXXXX", map to "XXXX" */
++	if (strlen(tty_name) > 3)
++		tty_name += 3;
++	strncpy(id, tty_name, width);
++
++	// touch(_PATH_BTMPX, 0600);
++	updwtmp(_PATH_BTMP, &utent);
++}
++
+ /* Send a failure message to the client, in responds to a userauth_request.
+  * Partial indicates whether to set the "partial success" flag,
+  * incrfail is whether to count this failure in the failure count (which
+@@ -426,6 +474,9 @@ void send_msg_userauth_failure(int partial, int incrfail) {
+ 		ses.authstate.failcount++;
+ 	}
+ 
++	if (incrfail)
++		write_new_btmp(getpid(), "ssh", ses.authstate.pw_name?ses.authstate.pw_name:"unknown", svr_ses.addrstring);
++
+ 	if (ses.authstate.failcount >= svr_opts.maxauthtries) {
+ 		char * userstr;
+ 		/* XXX - send disconnect ? */
+-- 
+2.17.1
+
