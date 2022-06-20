@@ -2,6 +2,18 @@
 #
 # dropbear
 #
+#	Siklu aplied changes:
+#	1. add macro DROPBEAR_FIX_MAKEFILE
+#	2.		DROPBEAR_POST_CONFIGURE_HOOKS
+#	2. add patch:
+# 		Patch file created by follow command:
+#			diff -uNr  dropbear-2016.74.orig dropbear-2016.74.new   -x *.log -x *.sta* -x .p*  -x Makefile* > dropbear-siklu-ver2016.74.patch
+#
+#	Check that dropbear's Makefile has line:
+#		LIBS+=-lutil -lz -lpam 
+#
+#	before generate patch file - clean all files except *.h and *.c:
+#		find . -not -name "*.c" -not -name "*.h"|xargs rm -rf
 ################################################################################
 
 DROPBEAR_VERSION = 2020.81
@@ -57,6 +69,15 @@ define DROPBEAR_SVR_PASSWORD_AUTH
 endef
 DROPBEAR_POST_EXTRACT_HOOKS += DROPBEAR_SVR_PASSWORD_AUTH
 endif
+
+
+define DROPBEAR_FIX_MAKEFILE
+	$(SED) 's,gensignkey.o gendss.o genrsa.o,gensignkey.o gendss.o genrsa.o siklu_dropbear.o,g' $(@D)/Makefile
+	$(SED) 's,-lutil,-lutil -lz -lpam,g' $(@D)/Makefile
+	#$(SED) 's,scpmisc.o compat.o,scpmisc.o compat.o siklu_dropbear.o,g' $(@D)/Makefile
+endef
+
+DROPBEAR_POST_CONFIGURE_HOOKS = DROPBEAR_FIX_MAKEFILE
 
 ifeq ($(BR2_PACKAGE_DROPBEAR_LEGACY_CRYPTO),y)
 define DROPBEAR_ENABLE_LEGACY_CRYPTO
