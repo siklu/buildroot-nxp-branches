@@ -4,7 +4,7 @@ BR2_ARM_FPU_VFPV4=y
 BR2_SVN="svn"
 BR2_DL_DIR="${CACHE_ROOT_DIR}/cache/siklu/portf/80XX/buildroot-dl"
 BR2_PRIMARY_SITE="${BUILDROOT_80XX_MIRROR}"
-BR2_PRIMARY_SITE_ONLY=y
+#BR2_PRIMARY_SITE_ONLY is not set
 BR2_CCACHE=y
 BR2_CCACHE_DIR="${CACHE_ROOT_DIR}/cache/siklu/portf/80XX/buildroot-ccache"
 BR2_SSP_NONE=y
