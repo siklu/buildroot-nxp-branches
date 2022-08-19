@@ -32,13 +32,11 @@ DROPBEAR_CPE_ID_PRODUCT = dropbear_ssh
 DROPBEAR_CONF_OPTS = --disable-harden
 
 ifeq ($(BR2_PACKAGE_DROPBEAR_CLIENT),y)
-# Build dbclient, and create a convenience symlink named ssh
 DROPBEAR_PROGRAMS += dbclient
-DROPBEAR_TARGET_BINS += dbclient ssh
 endif
 
 DROPBEAR_MAKE = \
-	$(MAKE) MULTI=1 SCPPROGRESS=1 \
+	$(MAKE) MULTI=0 SCPPROGRESS=1 \
 	PROGRAMS="$(DROPBEAR_PROGRAMS)"
 
 # With BR2_SHARED_STATIC_LIBS=y the generic infrastructure adds a
@@ -79,19 +77,34 @@ endef
 
 DROPBEAR_POST_CONFIGURE_HOOKS = DROPBEAR_FIX_MAKEFILE
 
-ifeq ($(BR2_PACKAGE_DROPBEAR_LEGACY_CRYPTO),y)
-define DROPBEAR_ENABLE_LEGACY_CRYPTO
-	echo '#define DROPBEAR_3DES 1'                  >> $(@D)/localoptions.h
-	echo '#define DROPBEAR_ENABLE_CBC_MODE 1'       >> $(@D)/localoptions.h
-	echo '#define DROPBEAR_SHA1_96_HMAC 1'          >> $(@D)/localoptions.h
+ifeq ($(BR2_PACKAGE_DROPBEAR_SVR_LEGACY_CRYPTO),y)
+define DROPBEAR_ENABLE_SVR_LEGACY_CRYPTO
+	echo '#define DROPBEAR_3DES 1'                  >> $(@D)/dropbear-options.h
+	echo '#define DROPBEAR_ENABLE_CBC_MODE 1'       >> $(@D)/dropbear-options.h
+	echo '#define DROPBEAR_SHA1_96_HMAC 1'          >> $(@D)/dropbear-options.h
 endef
-DROPBEAR_POST_EXTRACT_HOOKS += DROPBEAR_ENABLE_LEGACY_CRYPTO
+DROPBEAR_POST_EXTRACT_HOOKS += DROPBEAR_ENABLE_SVR_LEGACY_CRYPTO
 else
-define DROPBEAR_DISABLE_LEGACY_CRYPTO
-	echo '#define DROPBEAR_DSS 0'                   >> $(@D)/localoptions.h
-	echo '#define DROPBEAR_DH_GROUP1 0'             >> $(@D)/localoptions.h
+define DROPBEAR_DISABLE_SVR_LEGACY_CRYPTO
+	echo '#define DROPBEAR_DSS 0'                   >> $(@D)/dropbear-options.h
+	echo '#define DROPBEAR_DH_GROUP1 0'             >> $(@D)/dropbear-options.h
 endef
-DROPBEAR_POST_EXTRACT_HOOKS += DROPBEAR_DISABLE_LEGACY_CRYPTO
+DROPBEAR_POST_EXTRACT_HOOKS += DROPBEAR_DISABLE_SVR_LEGACY_CRYPTO
+endif
+
+ifeq ($(BR2_PACKAGE_DROPBEAR_CLI_LEGACY_CRYPTO),y)
+define DROPBEAR_ENABLE_CLI_LEGACY_CRYPTO
+	echo '#define DROPBEAR_3DES 1'                  >> $(@D)/dbclient-options.h
+	echo '#define DROPBEAR_ENABLE_CBC_MODE 1'       >> $(@D)/dbclient-options.h
+	echo '#define DROPBEAR_SHA1_96_HMAC 1'          >> $(@D)/dbclient-options.h
+endef
+DROPBEAR_POST_EXTRACT_HOOKS += DROPBEAR_ENABLE_CLI_LEGACY_CRYPTO
+else
+define DROPBEAR_DISABLE_CLI_LEGACY_CRYPTO
+	echo '#define DROPBEAR_DSS 0'                   >> $(@D)/dbclient-options.h
+	echo '#define DROPBEAR_DH_GROUP1 0'             >> $(@D)/dbclient-options.h
+endef
+DROPBEAR_POST_EXTRACT_HOOKS += DROPBEAR_DISABLE_CLI_LEGACY_CRYPTO
 endif
 
 ifeq ($(BR2_PACKAGE_DROPBEAR_DISABLE_REVERSEDNS),)
@@ -155,7 +168,9 @@ DROPBEAR_POST_EXTRACT_HOOKS += DROPBEAR_APPEND_LOCALOPTIONS_FILE
 endif
 
 define DROPBEAR_INSTALL_TARGET_CMDS
-	$(INSTALL) -m 755 $(@D)/dropbearmulti $(TARGET_DIR)/usr/sbin/dropbear
+	$(INSTALL) -m 755 $(@D)/dropbear $(TARGET_DIR)/usr/sbin/dropbear
+	$(INSTALL) -m 755 $(@D)/dbclient $(TARGET_DIR)/usr/bin/dbclient
+	ln -snf dbclient $(TARGET_DIR)/usr/bin/ssh
 	for f in $(DROPBEAR_TARGET_BINS); do \
 		ln -snf ../sbin/dropbear $(TARGET_DIR)/usr/bin/$$f ; \
 	done
