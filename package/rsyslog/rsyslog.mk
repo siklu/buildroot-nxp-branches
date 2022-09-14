@@ -20,6 +20,10 @@ RSYSLOG_PLUGINS = imdiag imfile impstats imptcp \
 	mail omprog omruleset omstdout omuxsock \
 	pmaixforwardedfrom pmciscoios pmcisconames pmlastmsg pmsnare
 
+RSYSLOG_DEBUG_CFLAGS = $(TARGET_CFLAGS) -g3
+# RSYSLOG_DEBUG_CFLAGS = $(CFLAGS) -g3
+CFLAGS="$(RSYSLOG_DEBUG_CFLAGS)"
+
 ifeq ($(BR2_PACKAGE_LIBRELP),y)
 RSYSLOG_DEPENDENCIES += librelp
 RSYSLOG_PLUGINS += relp
