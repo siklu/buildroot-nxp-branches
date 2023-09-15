@@ -1,0 +1,38 @@
+--- a/modules/pam_faillock/pam_faillock.c
++++ b/modules/pam_faillock/pam_faillock.c
+@@ -374,6 +374,22 @@
+ 		return PAM_IGNORE;
+ 	}
+ 
++// Siklu changes for Jira ticket PORTF-1547:
++//  - user from TACACS/RADIUS server cannot be resolved (user-name -> uid) here;
++//  - hardcode output values.
++//
++// Reason: original PAM module resolution is implemented with getpwnam() function.
++//  which uses Name Service Switch (NSS) mechanism (with configuration file /etc/nsswitch.conf) for retrieving uid by username.
++//  PAM faillock uses this uid to prevent root/admingroup from blocking.
++//  We don't allow root to login over SSH with any AAA mode (local/radius/tacacs) - thus this check is irrelevant for our needs.
++//
++// Siklu uses AAA mechanism which works in different way:
++//  - if AAA is confugured as local mode, it uses /etc/passwd file and NSS resolution works;
++//  - if AAA is configured as TACACS/RADIUS mode, NSS resolution is not involved.
++//  Because TACACS/RADIUS doesn't support NSS, PAM libfaillock fails to resolve user and as result doesn't block him.
++//
++// Fix: disable NSS resolution, assign output hardcoded information
++#if 0
+ 	if ((pwd=pam_modutil_getpwnam(pamh, user)) == NULL) {
+ 		if (opts->flags & FAILLOCK_FLAG_AUDIT) {
+ 			pam_syslog(pamh, LOG_NOTICE, "User unknown: %s", user);
+@@ -395,6 +411,12 @@
+ 		opts->is_admin = pam_modutil_user_in_group_uid_nam(pamh,
+ 			pwd->pw_uid, opts->admin_group);
+ 	}
++#endif
++	(void)pwd;
++	opts->user = user; 	// will be used as filename for tally file
++	opts->uid = 501;	// will be used as uid of tally file
++	opts->is_admin = 0;	// always not admin (members of admin group are handled by pam_faillock.so the same as the root, see faillock.conf)
++// End of Siklu changes
+ 
+ 	return PAM_SUCCESS;
+ }
