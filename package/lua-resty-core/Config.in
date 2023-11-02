@@ -1,0 +1,6 @@
+config BR2_PACKAGE_LUA_RESTY_CORE
+	bool "lua-resty-core"
+	help
+	  Lua resty core master.
+
+	  https://github.com/openresty/lua-resty-core

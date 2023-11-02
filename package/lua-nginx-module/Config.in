@@ -1,0 +1,6 @@
+config BR2_PACKAGE_LUA_NGINX_MODULE
+	bool "lua-nginx-module"
+	help
+	  Lua nginx module master.
+
+	  https://github.com/openresty/lua-nginx-module

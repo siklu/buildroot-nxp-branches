@@ -1,0 +1,6 @@
+config BR2_PACKAGE_LUA_RESTY_LRUCACHE
+	bool "lua-resty-lrucache"
+	help
+	  Lua resty lrucache master.
+
+	  https://github.com/openresty/lua-resty-lrucache
