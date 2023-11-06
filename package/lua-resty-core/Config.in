@@ -1,6 +1,6 @@
 config BR2_PACKAGE_LUA_RESTY_CORE
 	bool "lua-resty-core"
 	help
-	  Lua resty core master.
+	  lua-resty-core - New FFI-based Lua API for ngx_http_lua_module and/or ngx_stream_lua_module
 
 	  https://github.com/openresty/lua-resty-core
