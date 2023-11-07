@@ -728,6 +728,8 @@ menu "Lua libraries/modules"
 	source "package/wsapi-fcgi/Config.in"
 	source "package/wsapi-xavante/Config.in"
 	source "package/xavante/Config.in"
+	source "package/lua-resty-core/Config.in"
+	source "package/lua-resty-lrucache/Config.in"
 endmenu
 endif
 	source "package/micropython/Config.in"
@@ -2254,6 +2256,8 @@ menu "External nginx modules"
 	source "package/nginx-modsecurity/Config.in"
 	source "package/nginx-naxsi/Config.in"
 	source "package/nginx-upload/Config.in"
+	source "package/lua-nginx-module/Config.in"
+	source "package/ngx-devel-kit/Config.in"
 endmenu
 endif
 	source "package/ngircd/Config.in"
