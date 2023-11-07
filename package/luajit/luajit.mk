@@ -4,8 +4,13 @@
 #
 ################################################################################
 
-LUAJIT_VERSION = 41fb94defa8f830ce69a8122b03f6ac3216d392a
-LUAJIT_SITE = $(call github,LuaJIT,LuaJIT,$(LUAJIT_VERSION))
+# original buildroot values
+#LUAJIT_VERSION = 41fb94defa8f830ce69a8122b03f6ac3216d392a
+#LUAJIT_SITE = $(call github,LuaJIT,LuaJIT,$(LUAJIT_VERSION))
+# siklu values
+LUAJIT_VERSION = 2.1-20231006
+LUAJIT_SITE = $(call github,openresty,luajit2,$(LUAJIT_VERSION))
+
 LUAJIT_LICENSE = MIT
 LUAJIT_LICENSE_FILES = COPYRIGHT
 LUAJIT_CPE_ID_VENDOR = luajit
