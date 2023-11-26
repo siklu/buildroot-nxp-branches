@@ -730,6 +730,7 @@ menu "Lua libraries/modules"
 	source "package/xavante/Config.in"
 	source "package/lua-resty-core/Config.in"
 	source "package/lua-resty-lrucache/Config.in"
+	source "package/lua-resty-websocket/Config.in"
 endmenu
 endif
 	source "package/micropython/Config.in"
