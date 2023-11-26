@@ -231,6 +231,14 @@ config BR2_PRIMARY_SITE_ONLY
 	  the project can be built even if the upstream tarball
 	  locations disappear.
 
+config BR2_LUAROCKS_MIRROR
+	string "LuaRocks mirror"
+	default "http://rocks.moonscript.org"
+	help
+	  LuaRocks repository.
+
+	  See http://luarocks.org
+
 if !BR2_PRIMARY_SITE_ONLY
 
 config BR2_BACKUP_SITE
@@ -270,14 +278,6 @@ config BR2_GNU_MIRROR
 
 	     http://ftp.gnu.org/pub/gnu
 	     http://mirror.aarnet.edu.au/pub/gnu
-
-config BR2_LUAROCKS_MIRROR
-	string "LuaRocks mirror"
-	default "http://rocks.moonscript.org"
-	help
-	  LuaRocks repository.
-
-	  See http://luarocks.org
 
 config BR2_CPAN_MIRROR
 	string "CPAN mirror (Perl packages)"

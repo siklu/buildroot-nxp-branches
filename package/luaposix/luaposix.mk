@@ -15,7 +15,7 @@ define LUAPOSIX_BUILD_CMDS
 		$(LUA_RUN) build-aux/luke \
 		CC="$(TARGET_CC)" \
 		CFLAGS="$(TARGET_CFLAGS)" \
-		LUA_INCDIR=$(STAGING_DIR)/usr/include \
+		LUA_INCDIR=$(STAGING_DIR)/usr/include/luajit-2.1/ \
 	)
 endef
 
