@@ -1,0 +1,6 @@
+config BR2_PACKAGE_LUA_RESTY_WEBSOCKET
+	bool "lua-resty-websocket"
+	help
+	  lua-resty-websocket - Lua WebSocket implementation for the ngx_lua module.
+
+	  https://github.com/openresty/lua-resty-websocket

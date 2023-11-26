@@ -113,7 +113,7 @@ define $(2)_INSTALL_TARGET_CMDS
 		$$(LUAROCKS_RUN_CMD) make --keep --deps-mode none \
 			--tree "$$(TARGET_DIR)/usr" \
 			DEPS_DIR="$$(STAGING_DIR)/usr" \
-			LUA_INCDIR="$$(STAGING_DIR)/usr/include" \
+			LUA_INCDIR="$$(STAGING_DIR)/usr/include/luajit-2.1" \
 			LUA_LIBDIR="$$(STAGING_DIR)/usr/lib" \
 			CC=$$(TARGET_CC) \
 			LD=$$(TARGET_CC) \
