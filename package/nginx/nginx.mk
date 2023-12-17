@@ -4,7 +4,8 @@
 #
 ################################################################################
 
-NGINX_VERSION = 1.24.0
+#NGINX_VERSION = 1.24.0
+NGINX_VERSION=1.20.1
 NGINX_SITE = https://nginx.org/download
 NGINX_LICENSE = BSD-2-Clause
 NGINX_LICENSE_FILES = LICENSE
@@ -164,7 +165,7 @@ NGINX_CONF_OPTS += --without-http_gzip_module
 endif
 
 ifeq ($(BR2_PACKAGE_NGINX_HTTP_REWRITE_MODULE),y)
-NGINX_DEPENDENCIES += pcre2
+NGINX_DEPENDENCIES += pcre
 else
 NGINX_CONF_OPTS += --without-http_rewrite_module
 endif
@@ -288,7 +289,7 @@ NGINX_CONF_OPTS += --add-module=$(NGINX_MODSECURITY_DIR)
 endif
 
 ifeq ($(BR2_PACKAGE_LUA_NGINX_MODULE),y)
-NGINX_DEPENDENCIES += lua-nginx-module luajit
+NGINX_DEPENDENCIES += lua-nginx-module luajit 
 export LUAJIT_INC=$(TARGET_DIR)/usr/include/luajit-2.1/
 export LUAJIT_LIB=$(TARGET_DIR)/usr/lib
 NGINX_CONF_OPTS += --add-module=$(LUA_NGINX_MODULE_DIR)
