@@ -1,0 +1,11 @@
+--- a/modules/pam_faillock/pam_faillock.c
++++ b/modules/pam_faillock/pam_faillock.c
+@@ -637,7 +637,7 @@
+            left = opts->latest_time + opts->unlock_time - opts->now;
+        }
+
+-       pam_info(pamh, _("The account is locked due to %u failed logins."),
++       pam_info(pamh, _("THE account is locked due to %u failed logins."),
+            (unsigned int)opts->failures);
+        if (left > 0) {
+            left = (left + 59)/60; /* minutes */
