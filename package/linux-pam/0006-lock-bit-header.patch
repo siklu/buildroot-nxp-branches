@@ -1,0 +1,10 @@
+--- a/modules/pam_faillock/faillock.h
++++ b/modules/pam_faillock/faillock.h
+@@ -50,6 +50,7 @@
+ #define TALLY_STATUS_VALID     0x1       /* the tally file entry is valid */
+ #define TALLY_STATUS_RHOST     0x2       /* the source is rhost */
+ #define TALLY_STATUS_TTY       0x4       /* the source is tty */
++#define TALLY_STATUS_LOCKED    0x8       /* user is locked */
+ /* If neither TALLY_FLAG_RHOST nor TALLY_FLAG_TTY are set the source is service. */
+ 
+ struct	tally {
