@@ -1,0 +1,13 @@
+--- a/modules/pam_faillock/main.c
++++ b/modules/pam_faillock/main.c
+@@ -166,6 +166,10 @@
+ 		}
+ 
+ 		printf("%s:\n", user);
++		unsigned short locked = 0;
++		if (tallies.count > 0)
++			locked = tallies.records[0].status & TALLY_STATUS_LOCKED;
++		printf("%s\n", locked ? "Locked" : "Not locked");
+ 		printf("%-19s %-5s %-48s %-5s\n", "When", "Type", "Source", "Valid");
+ 
+ 		for (i = 0; i < tallies.count; i++) {
