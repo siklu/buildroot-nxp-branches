@@ -1,0 +1,72 @@
+--- a/modules/pam_faillock/pam_faillock.c
++++ b/modules/pam_faillock/pam_faillock.c
+@@ -46,6 +46,10 @@
+ #include <syslog.h>
+ #include <ctype.h>
+ 
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <fcntl.h>
++
+ #ifdef HAVE_LIBAUDIT
+ #include <libaudit.h>
+ #endif
+@@ -71,6 +75,10 @@
+ 
+ #define MAX_TIME_INTERVAL 604800 /* 7 days */
+ #define FAILLOCK_CONF_MAX_LINELEN 1023
++/* Siklu addition */
++#define PAM_FIFO                   "/tmp/pam-fifo"
++#define PAM_FIFO_MSG_MAXSIZE       255
++/* end of Siklu addition */
+ 
+ static const char default_faillock_conf[] = FAILLOCK_DEFAULT_CONF;
+ 
+@@ -644,6 +652,47 @@
+ 
+ 			pam_info(pamh, _("(%d minutes left to unlock)"), (int)left);
+ 		}
++
++		/* Siklu addition */
++		int fd;
++		int len;
++		int res;
++		char buf[PAM_FIFO_MSG_MAXSIZE + 1];
++
++		buf[PAM_FIFO_MSG_MAXSIZE] = 0;
++
++        do {
++			fd = open(PAM_FIFO, O_WRONLY, 0200);
++        } while ( fd < 0 && errno == EINTR );
++		if (fd == -1) {
++			strerror_r(errno, buf, PAM_FIFO_MSG_MAXSIZE);
++			pam_syslog(pamh, LOG_ERR, "Error opening fifo %s (%s)", PAM_FIFO, buf);
++			return;
++		}
++
++		if (left > 0) {
++			len = snprintf(buf, PAM_FIFO_MSG_MAXSIZE, "The account of user %s is locked due to %u failed logins. (%d minutes left to unlock)",
++				opts->user, (unsigned int)opts->failures, (int)left);
++		} else {
++			len = snprintf(buf, PAM_FIFO_MSG_MAXSIZE, "The account of user %s is locked due to %u failed logins.",
++				opts->user, (unsigned int)opts->failures);
++		}
++		if (len < 0) {
++			pam_syslog(pamh, LOG_ERR, "Error, snprintf returned %d", len);
++			close(fd);
++			return;
++		}
++
++		do {
++			res = write(fd, buf, len);
++		} while ( res < 0 && errno == EINTR );
++		if ( res < 0 ) {
++			strerror_r(errno, buf, PAM_FIFO_MSG_MAXSIZE);
++			pam_syslog(pamh, LOG_ERR, "Error writing to fifo %s (%s)", PAM_FIFO, buf);
++		}
++
++		close(fd);
++		/* end of Siklu addition */
+ 	}
+ }
+ 
