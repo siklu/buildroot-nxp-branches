@@ -45,10 +45,10 @@
 +		}
 +
 +		if (left > 0) {
-+			len = snprintf(buf, PAM_FIFO_MSG_MAXSIZE, "The account of user %s is locked due to %u failed logins. (%d minutes left to unlock)",
++			len = snprintf(buf, PAM_FIFO_MSG_MAXSIZE, "The account of user %s is locked due to %u failed logins. (%d minutes left to unlock)\n",
 +				opts->user, (unsigned int)opts->failures, (int)left);
 +		} else {
-+			len = snprintf(buf, PAM_FIFO_MSG_MAXSIZE, "The account of user %s is locked due to %u failed logins.",
++			len = snprintf(buf, PAM_FIFO_MSG_MAXSIZE, "The account of user %s is locked due to %u failed logins.\n",
 +				opts->user, (unsigned int)opts->failures);
 +		}
 +		if (len < 0) {
