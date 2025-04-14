@@ -1,16 +1,16 @@
-From 6069ab55f4276f720106afad1057a0181ef78705 Mon Sep 17 00:00:00 2001
+From 7ab674336baf46123a0ba17df2edb036711c9203 Mon Sep 17 00:00:00 2001
 From: Jonathan BEN-AVRAHAM <jonathan.ba@siklu.com>
 Date: Fri, 10 Jun 2022 10:47:48 +0300
-Subject: [PATCH] siklu-dropbear-2020.81-btmp
+Subject: [PATCH] siklu-dropbear-2024.86-btmp
 
 ---
- svr-auth.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/svr-auth.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++
  1 file changed, 51 insertions(+)
 
-diff --git a/svr-auth.c b/svr-auth.c
-index 443de20..14c8661 100644
---- a/svr-auth.c
-+++ b/svr-auth.c
+diff --git a/src/svr-auth.c b/src/svr-auth.c
+index 98cc518..e145a63 100644
+--- a/src/svr-auth.c
++++ b/src/svr-auth.c
 @@ -341,6 +341,54 @@ goodshell:
  	return DROPBEAR_SUCCESS;
  }
@@ -77,5 +77,5 @@ index 443de20..14c8661 100644
  		char * userstr;
  		/* XXX - send disconnect ? */
 -- 
-2.17.1
+2.47.1.windows.1
 

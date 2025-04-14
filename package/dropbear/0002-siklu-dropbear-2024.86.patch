@@ -1,27 +1,27 @@
-From 9bcb6dea71cb8ab44dc20c1565c57b16ca3240ba Mon Sep 17 00:00:00 2001
-From: Jonathan BEN-AVRAHAM <jonathan.ba@siklu.com>
-Date: Fri, 10 Jun 2022 10:44:48 +0300
-Subject: [PATCH] siklu-dropbear-2020.81
+From a413a29163c3de9719d0a6cdb075d45101f7b1cd Mon Sep 17 00:00:00 2001
+From: Dmitry Grinberg <dmitryg@ceragon.com>
+Date: Mon, 14 Apr 2025 21:06:15 +0300
+Subject: [PATCH] siklu-dropbear-2024.86
 
 ---
- cli-kex.c         |  2 +-
- cli-runopts.c     |  2 +-
- common-session.c  |  2 +-
- dbutil.c          |  2 +-
- default_options.h | 12 +++++++-----
- dropbearkey.c     |  2 +-
- includes.h        |  2 ++
- loginrec.c        |  2 +-
- svr-authpam.c     | 32 ++++++++++++++++++++++++++++----
- svr-chansession.c |  5 +++--
- sysoptions.h      |  2 +-
+ src/cli-kex.c         |  2 +-
+ src/cli-runopts.c     |  2 +-
+ src/common-session.c  |  2 +-
+ src/dbutil.c          |  2 +-
+ src/default_options.h | 12 +++++++-----
+ src/dropbearkey.c     |  2 +-
+ src/includes.h        |  2 ++
+ src/loginrec.c        |  2 +-
+ src/svr-authpam.c     | 32 ++++++++++++++++++++++++++++----
+ src/svr-chansession.c |  5 +++--
+ src/sysoptions.h      |  2 +-
  11 files changed, 47 insertions(+), 18 deletions(-)
 
-diff --git a/cli-kex.c b/cli-kex.c
-index 4f2a884..b6b2c72 100644
---- a/cli-kex.c
-+++ b/cli-kex.c
-@@ -248,7 +248,7 @@ static FILE* open_known_hosts_file(int * readonly)
+diff --git a/src/cli-kex.c b/src/cli-kex.c
+index 6d2e4ac..fe0a29e 100644
+--- a/src/cli-kex.c
++++ b/src/cli-kex.c
+@@ -264,7 +264,7 @@ static FILE* open_known_hosts_file(int * readonly)
  
  	if (!homedir) {
  		struct passwd * pw = NULL;
@@ -30,11 +30,11 @@ index 4f2a884..b6b2c72 100644
  		if (pw) {
  			homedir = pw->pw_dir;
  		}
-diff --git a/cli-runopts.c b/cli-runopts.c
-index 3654b9a..2588849 100644
---- a/cli-runopts.c
-+++ b/cli-runopts.c
-@@ -734,7 +734,7 @@ static void fill_own_user() {
+diff --git a/src/cli-runopts.c b/src/cli-runopts.c
+index 680fa4d..7953c43 100644
+--- a/src/cli-runopts.c
++++ b/src/cli-runopts.c
+@@ -771,7 +771,7 @@ static void fill_own_user() {
  
  	uid = getuid();
  
@@ -43,11 +43,11 @@ index 3654b9a..2588849 100644
  	if (pw && pw->pw_name != NULL) {
  		cli_opts.own_user = m_strdup(pw->pw_name);
  	} else {
-diff --git a/common-session.c b/common-session.c
-index bfe6284..bb10869 100644
---- a/common-session.c
-+++ b/common-session.c
-@@ -628,7 +628,7 @@ void fill_passwd(const char* username) {
+diff --git a/src/common-session.c b/src/common-session.c
+index a045adf..af882af 100644
+--- a/src/common-session.c
++++ b/src/common-session.c
+@@ -641,7 +641,7 @@ void fill_passwd(const char* username) {
  	if (ses.authstate.pw_passwd)
  		m_free(ses.authstate.pw_passwd);
  
@@ -56,25 +56,25 @@ index bfe6284..bb10869 100644
  	if (!pw) {
  		return;
  	}
-diff --git a/dbutil.c b/dbutil.c
-index 5af6330..3f2a95f 100644
---- a/dbutil.c
-+++ b/dbutil.c
-@@ -585,7 +585,7 @@ otherwise home directory is prepended */
- char * expand_homedir_path(const char *inpath) {
- 	struct passwd *pw = NULL;
- 	if (inpath[0] != '/') {
--		pw = getpwuid(getuid());
-+		pw = _getpwuid(getuid()); // Siklu
- 		if (pw && pw->pw_dir) {
- 			int len = strlen(inpath) + strlen(pw->pw_dir) + 2;
- 			char *buf = m_malloc(len);
-diff --git a/default_options.h b/default_options.h
-index 375506d..9ce6946 100644
---- a/default_options.h
-+++ b/default_options.h
-@@ -192,16 +192,18 @@ group1 in Dropbear server too */
- #define MOTD_FILENAME "/etc/motd"
+diff --git a/src/dbutil.c b/src/dbutil.c
+index 2bc1a0b..1348f5a 100644
+--- a/src/dbutil.c
++++ b/src/dbutil.c
+@@ -645,7 +645,7 @@ char * expand_homedir_path(const char *inpath) {
+ 		char *homedir = getenv("HOME");
+ 
+ 		if (!homedir) {
+-			pw = getpwuid(getuid());
++			pw = _getpwuid(getuid()); // Siklu
+ 			if (pw) {
+ 				homedir = pw->pw_dir;
+ 			}
+diff --git a/src/default_options.h b/src/default_options.h
+index 6e970bb..3271a59 100644
+--- a/src/default_options.h
++++ b/src/default_options.h
+@@ -227,16 +227,18 @@ group1 in Dropbear server too */
+ #define MOTD_MAXSIZE 2000
  
  /* Authentication Types - at least one required.
 -   RFC Draft requires pubkey auth, and recommends password */
@@ -94,35 +94,35 @@ index 375506d..9ce6946 100644
 +  Siklu - changed to '1' */
 +#define DROPBEAR_SVR_PAM_AUTH 1
  
- /* ~/.ssh/authorized_keys authentication */
- #define DROPBEAR_SVR_PUBKEY_AUTH 1
-@@ -250,7 +252,7 @@ Homedir is prepended unless path begins with / */
+ /* ~/.ssh/authorized_keys authentication.
+  * You must define DROPBEAR_SVR_PUBKEY_AUTH in order to use plugins. */
+@@ -291,7 +293,7 @@ group1 in Dropbear server too */
  
- /* And then a global limit to avoid chewing memory if connections 
+ /* And then a global limit to avoid chewing memory if connections
   * come from many IPs */
 -#define MAX_UNAUTH_CLIENTS 30
 +#define MAX_UNAUTH_CLIENTS 10 /*Siklu was 30*/
  
  /* Default maximum number of failed authentication tries (server option) */
  /* -T server option overrides */
-diff --git a/dropbearkey.c b/dropbearkey.c
-index 8d8c7c2..ef1857c 100644
---- a/dropbearkey.c
-+++ b/dropbearkey.c
-@@ -351,7 +351,7 @@ static void printpubkey(sign_key * key, int keytype) {
- 
- 	/* a user@host comment is informative */
- 	username = "";
--	pw = getpwuid(getuid());
-+	pw = _getpwuid(getuid()); // Siklu
- 	if (pw) {
- 		username = pw->pw_name;
- 	}
-diff --git a/includes.h b/includes.h
-index 884ebf7..1e4c117 100644
---- a/includes.h
-+++ b/includes.h
-@@ -60,6 +60,8 @@
+diff --git a/src/dropbearkey.c b/src/dropbearkey.c
+index 99e631f..dcf6db3 100644
+--- a/src/dropbearkey.c
++++ b/src/dropbearkey.c
+@@ -408,7 +408,7 @@ static void printpubkey(sign_key * key, int keytype, const char * comment, int c
+ 	} else {
+ 		/* a user@host comment is informative */
+ 		username = "";
+-		pw = getpwuid(getuid());
++		pw = _getpwuid(getuid()); // Siklu
+ 		if (pw) {
+ 			username = pw->pw_name;
+ 		}
+diff --git a/src/includes.h b/src/includes.h
+index 98d35de..f950ff0 100644
+--- a/src/includes.h
++++ b/src/includes.h
+@@ -57,6 +57,8 @@
  #include <time.h>
  #include <setjmp.h>
  
@@ -131,10 +131,10 @@ index 884ebf7..1e4c117 100644
  #ifdef HAVE_UTMP_H
  #include <utmp.h>
  #endif
-diff --git a/loginrec.c b/loginrec.c
-index af10d95..dd202f6 100644
---- a/loginrec.c
-+++ b/loginrec.c
+diff --git a/src/loginrec.c b/src/loginrec.c
+index b543bcb..0bc0fc2 100644
+--- a/src/loginrec.c
++++ b/src/loginrec.c
 @@ -275,7 +275,7 @@ login_init_entry(struct logininfo *li, int pid, const char *username,
  
  	if (username) {
@@ -144,11 +144,11 @@ index af10d95..dd202f6 100644
  		if (pw == NULL)
  			dropbear_exit("login_init_entry: Cannot find user \"%s\"",
  					li->username);
-diff --git a/svr-authpam.c b/svr-authpam.c
-index e236db4..8d347ee 100644
---- a/svr-authpam.c
-+++ b/svr-authpam.c
-@@ -250,9 +250,10 @@ void svr_auth_pam(int valid_user) {
+diff --git a/src/svr-authpam.c b/src/svr-authpam.c
+index ec14632..a4814e0 100644
+--- a/src/svr-authpam.c
++++ b/src/svr-authpam.c
+@@ -251,9 +251,10 @@ void svr_auth_pam(int valid_user) {
  	/* (void) pam_set_item(pamHandlep, PAM_FAIL_DELAY, (void*) pamDelayFunc); */
  
  	if ((rc = pam_authenticate(pamHandlep, 0)) != PAM_SUCCESS) {
@@ -161,7 +161,7 @@ index e236db4..8d347ee 100644
  				"Bad PAM password attempt for '%s' from %s",
  				printable_user,
  				svr_ses.addrstring);
-@@ -261,9 +262,10 @@ void svr_auth_pam(int valid_user) {
+@@ -262,9 +263,10 @@ void svr_auth_pam(int valid_user) {
  	}
  
  	if ((rc = pam_acct_mgmt(pamHandlep, 0)) != PAM_SUCCESS) {
@@ -174,7 +174,7 @@ index e236db4..8d347ee 100644
  				"Bad PAM password attempt for '%s' from %s",
  				printable_user,
  				svr_ses.addrstring);
-@@ -278,6 +280,28 @@ void svr_auth_pam(int valid_user) {
+@@ -279,6 +281,28 @@ void svr_auth_pam(int valid_user) {
  		goto cleanup;
  	}
  
@@ -200,14 +200,14 @@ index e236db4..8d347ee 100644
 +	}
 +	// ========================== siklu addition end  ===========================
 +
- 	/* successful authentication */
- 	dropbear_log(LOG_NOTICE, "PAM password auth succeeded for '%s' from %s",
- 			ses.authstate.pw_name,
-diff --git a/svr-chansession.c b/svr-chansession.c
-index d090395..5dbf28b 100644
---- a/svr-chansession.c
-+++ b/svr-chansession.c
-@@ -607,7 +607,7 @@ static int sessionpty(struct ChanSess * chansess) {
+ 	if (svr_opts.multiauthmethod && (ses.authstate.authtypes & ~AUTH_TYPE_PASSWORD)) {
+ 			/* successful PAM password authentication, but extra auth required */
+ 			dropbear_log(LOG_NOTICE,
+diff --git a/src/svr-chansession.c b/src/svr-chansession.c
+index 2ca6fc1..331bdca 100644
+--- a/src/svr-chansession.c
++++ b/src/svr-chansession.c
+@@ -608,7 +608,7 @@ static int sessionpty(struct ChanSess * chansess) {
  		dropbear_exit("Out of memory"); /* TODO disconnect */
  	}
  
@@ -216,23 +216,23 @@ index d090395..5dbf28b 100644
  	if (!pw)
  		dropbear_exit("getpwnam failed after succeeding previously");
  	pty_setowner(pw, chansess->tty);
-@@ -941,7 +941,8 @@ static void execchild(const void *user_data) {
- 	 * etc. This is hazardous, so should only be used for debugging. */
+@@ -970,7 +970,8 @@ static void execchild(const void *user_data) {
+ 	if ( !svr_opts.pass_on_env) {
  #ifndef DEBUG_VALGRIND
  #ifdef HAVE_CLEARENV
--	clearenv();
+-		clearenv();
 +	// clearenv();   // Siklu do not clear environment here. we need to relay all environment as-is
 +	// 		with environment received from remote tacacs server to our cli application
  #else /* don't HAVE_CLEARENV */
- 	/* Yay for posix. */
- 	if (environ) {
-diff --git a/sysoptions.h b/sysoptions.h
-index 3107a0e..78bc409 100644
---- a/sysoptions.h
-+++ b/sysoptions.h
-@@ -192,7 +192,7 @@ If you test it please contact the Dropbear author */
+ 		/* Yay for posix. */
+ 		if (environ) {
+diff --git a/src/sysoptions.h b/src/sysoptions.h
+index 9b325d5..f276be7 100644
+--- a/src/sysoptions.h
++++ b/src/sysoptions.h
+@@ -235,7 +235,7 @@
  								RECV_WINDOWEXTEND bytes */
- #define MAX_RECV_WINDOW (1024*1024) /* 1 MB should be enough */
+ #define MAX_RECV_WINDOW (10*1024*1024) /* 10 MB should be enough */
  
 -#define MAX_CHANNELS 1000 /* simple mem restriction, includes each tcp/x11
 +#define MAX_CHANNELS 10/*Siklu, was 1000*/ /* simple mem restriction, includes each tcp/x11
@@ -240,5 +240,5 @@ index 3107a0e..78bc409 100644
  
  #define MAX_STRING_LEN (MAX(MAX_CMD_LEN, 2400)) /* Sun SSH needs 2400 for algos,
 -- 
-2.17.1
+2.47.1.windows.1
 

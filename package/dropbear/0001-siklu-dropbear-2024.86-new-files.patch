@@ -1,7 +1,7 @@
-From f2a2c4ed2d90e41b5dada9de6ba419428487739f Mon Sep 17 00:00:00 2001
+From 7f3f1e9607744591ee0876b924d6501567a96671 Mon Sep 17 00:00:00 2001
 From: Jonathan BEN-AVRAHAM <jonathan.ba@siklu.com>
 Date: Fri, 10 Jun 2022 11:37:53 +0300
-Subject: [PATCH] siklu-dropbear-2020.81-new-files
+Subject: [PATCH] siklu-dropbear-2024.86-new-files
 
 ---
  siklu_dropbear.c | 153 +++++++++++++++++++++++++++++++++++++++++++++++
@@ -207,5 +207,5 @@ index 0000000..1350da8
 +
 +#endif /* SIKLU_PWD_H_ */
 -- 
-2.17.1
+2.47.1.windows.1
 
