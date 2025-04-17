@@ -2,21 +2,9 @@
 #
 # dropbear
 #
-#	Siklu aplied changes:
-#	1. add macro DROPBEAR_FIX_MAKEFILE
-#	2.		DROPBEAR_POST_CONFIGURE_HOOKS
-#	2. add patch:
-# 		Patch file created by follow command:
-#			diff -uNr  dropbear-2016.74.orig dropbear-2016.74.new   -x *.log -x *.sta* -x .p*  -x Makefile* > dropbear-siklu-ver2016.74.patch
-#
-#	Check that dropbear's Makefile has line:
-#		LIBS+=-lutil -lz -lpam 
-#
-#	before generate patch file - clean all files except *.h and *.c:
-#		find . -not -name "*.c" -not -name "*.h"|xargs rm -rf
 ################################################################################
 
-DROPBEAR_VERSION = 2020.81
+DROPBEAR_VERSION = 2024.86
 DROPBEAR_SITE = https://matt.ucc.asn.au/dropbear/releases
 DROPBEAR_SOURCE = dropbear-$(DROPBEAR_VERSION).tar.bz2
 DROPBEAR_LICENSE = MIT, BSD-2-Clause, Public domain
@@ -48,6 +36,10 @@ ifeq ($(BR2_SHARED_STATIC_LIBS),y)
 DROPBEAR_CONF_OPTS += --disable-static
 endif
 
+ifeq ($(BR2_PACKAGE_LIBXCRYPT),y)
+DROPBEAR_DEPENDENCIES += libxcrypt
+endif
+
 ifeq ($(BR2_PACKAGE_LINUX_PAM),y)
 define DROPBEAR_SVR_PAM_AUTH
 	echo '#define DROPBEAR_SVR_PASSWORD_AUTH 0'     >> $(@D)/localoptions.h
@@ -70,28 +62,15 @@ endef
 DROPBEAR_POST_EXTRACT_HOOKS += DROPBEAR_SVR_PASSWORD_AUTH
 endif
 
-
-define DROPBEAR_FIX_MAKEFILE
-	$(SED) 's,gensignkey.o gendss.o genrsa.o,gensignkey.o gendss.o genrsa.o siklu_dropbear.o,g' $(@D)/Makefile
-	$(SED) 's,-lutil,-lutil -lz -lpam,g' $(@D)/Makefile
-	#$(SED) 's,scpmisc.o compat.o,scpmisc.o compat.o siklu_dropbear.o,g' $(@D)/Makefile
-endef
-
-DROPBEAR_POST_CONFIGURE_HOOKS = DROPBEAR_FIX_MAKEFILE
-
 ifeq ($(BR2_PACKAGE_DROPBEAR_LEGACY_CRYPTO),y)
 define DROPBEAR_ENABLE_LEGACY_CRYPTO
 	echo '#define DROPBEAR_3DES 1'                  >> $(@D)/localoptions.h
 	echo '#define DROPBEAR_ENABLE_CBC_MODE 1'       >> $(@D)/localoptions.h
 	echo '#define DROPBEAR_SHA1_96_HMAC 1'          >> $(@D)/localoptions.h
+	echo '#define DROPBEAR_DH_GROUP1 1'             >> $(@D)/localoptions.h
+	echo '#define DROPBEAR_DSS 1'                   >> $(@D)/localoptions.h
 endef
 DROPBEAR_POST_EXTRACT_HOOKS += DROPBEAR_ENABLE_LEGACY_CRYPTO
-else
-define DROPBEAR_DISABLE_LEGACY_CRYPTO
-	echo '#define DROPBEAR_DSS 0'                   >> $(@D)/localoptions.h
-	echo '#define DROPBEAR_DH_GROUP1 0'             >> $(@D)/localoptions.h
-endef
-DROPBEAR_POST_EXTRACT_HOOKS += DROPBEAR_DISABLE_LEGACY_CRYPTO
 endif
 
 ifeq ($(BR2_PACKAGE_DROPBEAR_DISABLE_REVERSEDNS),)
@@ -108,8 +87,6 @@ DROPBEAR_CONF_OPTS += --disable-zlib --enable-bundled-libtom
 else
 define DROPBEAR_BUILD_FEATURED
 	echo '#define DROPBEAR_SMALL_CODE 0'            >> $(@D)/localoptions.h
-	echo '#define DROPBEAR_TWOFISH128 1'            >> $(@D)/localoptions.h
-	echo '#define DROPBEAR_TWOFISH256 1'            >> $(@D)/localoptions.h
 endef
 DROPBEAR_POST_EXTRACT_HOOKS += DROPBEAR_BUILD_FEATURED
 DROPBEAR_DEPENDENCIES += zlib libtomcrypt
