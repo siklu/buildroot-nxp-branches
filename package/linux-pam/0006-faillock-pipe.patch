@@ -1,6 +1,6 @@
 --- a/modules/pam_faillock/pam_faillock.c
 +++ b/modules/pam_faillock/pam_faillock.c
-@@ -46,6 +46,10 @@
+@@ -45,6 +45,10 @@
  #include <syslog.h>
  #include <ctype.h>
  
@@ -11,20 +11,21 @@
  #ifdef HAVE_LIBAUDIT
  #include <libaudit.h>
  #endif
-@@ -71,6 +75,10 @@
+@@ -64,6 +68,11 @@
  
- #define MAX_TIME_INTERVAL 604800 /* 7 days */
- #define FAILLOCK_CONF_MAX_LINELEN 1023
+ #define FAILLOCK_AUTH_EXECUTED   "pam_faillock:auth_executed"
+ 
 +/* Siklu addition */
 +#define PAM_FIFO                   "/tmp/pam-fifo"
 +#define PAM_FIFO_MSG_MAXSIZE       255
 +/* end of Siklu addition */
- 
- static const char default_faillock_conf[] = FAILLOCK_DEFAULT_CONF;
- 
-@@ -644,6 +652,47 @@
- 
- 			pam_info(pamh, _("(%d minutes left to unlock)"), (int)left);
++
+ static int
+ args_parse(pam_handle_t *pamh, int argc, const char **argv,
+ 		int flags, struct options *opts)
+@@ -458,6 +467,47 @@
+ 				pam_info(pamh, _("(%d minutes left to unlock)"), (int)left);
+ #endif
  		}
 +
 +		/* Siklu addition */
