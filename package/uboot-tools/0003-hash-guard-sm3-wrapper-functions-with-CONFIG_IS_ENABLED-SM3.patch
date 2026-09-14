@@ -1,0 +1,18 @@
+--- a/common/hash.c
++++ b/common/hash.c
+@@ -144,6 +144,7 @@
+ 	return 0;
+ }
+ 
++#if CONFIG_IS_ENABLED(SM3)
+ static int __maybe_unused hash_init_sm3(struct hash_algo *algo, void **ctxp)
+ {
+ 	struct sm3_context *ctx = malloc(sizeof(struct sm3_context));
+@@ -171,6 +172,7 @@
+ 	free(ctx);
+ 	return 0;
+ }
++#endif
+ 
+ static int __maybe_unused hash_init_crc16_ccitt(struct hash_algo *algo,
+ 						void **ctxp)
