@@ -1,17 +1,6 @@
-From 4949bb5c57f7cf6f6fcf82a3395d84e39540bbd3 Mon Sep 17 00:00:00 2001
-From: Jonathan BEN-AVRAHAM <jonathan.ba@siklu.com>
-Date: Fri, 10 Jun 2022 10:47:48 +0300
-Subject: [PATCH] siklu-dropbear-2024.86-btmp
-
----
- src/svr-auth.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 51 insertions(+)
-
-diff --git a/src/svr-auth.c b/src/svr-auth.c
-index 98cc518..e145a63 100644
 --- a/src/svr-auth.c
 +++ b/src/svr-auth.c
-@@ -341,6 +341,54 @@ goodshell:
+@@ -340,6 +340,54 @@
  	return DROPBEAR_SUCCESS;
  }
  
@@ -66,16 +55,13 @@ index 98cc518..e145a63 100644
  /* Send a failure message to the client, in responds to a userauth_request.
   * Partial indicates whether to set the "partial success" flag,
   * incrfail is whether to count this failure in the failure count (which
-@@ -426,6 +474,9 @@ void send_msg_userauth_failure(int partial, int incrfail) {
+@@ -425,6 +473,9 @@
  		ses.authstate.failcount++;
  	}
  
 +	if (incrfail)
-+		write_new_btmp(getpid(), "ssh", ses.authstate.pw_name?ses.authstate.pw_name:"unknown", svr_ses.addrstring);
++		write_new_btmp(getpid(), "ssh", ses.authstate.username?ses.authstate.username:"unknown", svr_ses.addrstring);
 +
- 	if (ses.authstate.failcount >= svr_opts.maxauthtries) {
+ 	if (ses.authstate.failcount > svr_opts.maxauthtries) {
  		char * userstr;
  		/* XXX - send disconnect ? */
--- 
-2.47.1.windows.1
-
