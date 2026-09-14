@@ -1,15 +1,6 @@
---- netsnmp-5.4.2.1_orig/agent/snmp_agent.c.origin	2012-05-29 17:10:49.252730000 +0300
-+++ netsnmp-5.4.2.1_new/agent/snmp_agent.c	2012-05-29 17:13:06.000000000 +0300
-@@ -34,7 +34,7 @@
- ******************************************************************/
- /*
-  * Portions of this file are copyrighted by:
-- * Copyright © 2003 Sun Microsystems, Inc. All rights 
-+ * Copyright ? 2003 Sun Microsystems, Inc. All rights 
-  * reserved.  Use is subject to license terms specified in the 
-  * COPYING file distributed with the Net-SNMP package.
-  */
-@@ -2505,6 +2505,10 @@
+--- a/agent/snmp_agent.c
++++ b/agent/snmp_agent.c
+@@ -2995,6 +2995,10 @@
      return asp->status;
  }
  
@@ -20,7 +11,7 @@
  int
  handle_var_requests(netsnmp_agent_session *asp)
  {
-@@ -2515,6 +2519,9 @@
+@@ -3005,6 +3009,9 @@
      asp->reqinfo->asp = asp;
      asp->reqinfo->mode = asp->mode;
  
@@ -30,7 +21,7 @@
      /*
       * now, have the subtrees in the cache go search for their results 
       */
-@@ -2588,6 +2595,10 @@
+@@ -3080,6 +3087,10 @@
          }
      }
  
