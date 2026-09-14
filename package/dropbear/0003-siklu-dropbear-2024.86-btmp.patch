@@ -49,7 +49,7 @@
 +	strncpy(id, tty_name, width);
 +
 +	// touch(_PATH_BTMPX, 0600);
-+	updwtmp(_PATH_BTMP, &utent);
++	updwtmpx(_PATH_BTMP, &utent);
 +}
 +
  /* Send a failure message to the client, in responds to a userauth_request.
