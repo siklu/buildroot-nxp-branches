@@ -91,7 +91,7 @@
  #endif
  
 +    /* !!! DO NOT DELETE THE FOLLOWING 2 LINES !!! */ 
-+    extern GetNumOfSinks(), AddMyDataToLastSink();
++    extern int GetNumOfSinks(); extern void AddMyDataToLastSink();
 +    printf("%p %p %p %p %p %p %p %p\n", GetNumOfSinks, AddMyDataToLastSink,
 +    		snmp_add_var, netsnmp_unregister_handler,
 +    		snmp_unregister_callback, snmp_set_var_typed_integer,
