@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LUA_NGINX_MODULE_VERSION = 0.10.25
+LUA_NGINX_MODULE_VERSION = 0.10.31
 LUA_NGINX_MODULE_SITE = $(call github,openresty,lua-nginx-module,$(LUA_NGINX_MODULE_VERSION))
 LUA_NGINX_MODULE_LICENSE = BSD
 LUA_NGINX_MODULE_LICENSE_FILES = LICENSE
