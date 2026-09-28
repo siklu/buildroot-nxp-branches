@@ -5,7 +5,7 @@
 ################################################################################
 
 LUA_RESTY_WEBSOCKET_VERSION = 0.10
-LUA_RESTY_WEBSOCKET_SITE = $(call github,openresty,lua-resty-websocket,$(LUA_RESTY_WEBSOCKET_VERSION))
+LUA_RESTY_WEBSOCKET_SITE = $(call github,openresty,lua-resty-websocket,v$(LUA_RESTY_WEBSOCKET_VERSION))
 LUA_RESTY_WEBSOCKET_SUBDIR = lua-resty-websocket
 LUA_RESTY_WEBSOCKET_LICENSE = BSD
 LUA_RESTY_WEBSOCKET_LICENSE_FILES = LICENSE
