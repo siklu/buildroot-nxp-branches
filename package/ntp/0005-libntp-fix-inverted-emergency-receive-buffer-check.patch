@@ -1,0 +1,68 @@
+libntp: fix inverted sense in the emergency receive-buffer check
+
+Backport of the upstream fix released in ntp 4.2.8p16, ChangeLog:
+
+  * [Bug 3666] avoid unlimited receive buffer allocation <perlinger@ntp.org>
+    - follow-up: fix inverted sense in check, reset shortfall counter
+
+4.2.8p15 introduced the receive-buffer limit and the "iron reserve" of
+emerg_recvbufs buffers, together with the urgent argument that says whether
+a caller may dip into that reserve.  The check got the two cases the wrong
+way round: with urgent set the threshold became emerg_recvbufs, and without
+it zero, so an urgent caller was refused first and the reserve protected
+nothing.  p15 is the only release carrying it.
+
+The visible consequence is a NULL dereference in ntpdate.  input_handler()
+decides a buffer is available by testing free_recvbuffs() == 0, then takes
+one with get_free_recv_buffer(TRUE) and uses it unchecked:
+
+	if (initializing || free_recvbuffs() == 0) {
+		...drop the packet...
+		continue;
+	}
+
+	rb = get_free_recv_buffer(TRUE);
+
+	fromlen = sizeof(rb->recv_srcadr);
+	rb->recv_length = recvfrom(fdc, ...);
+
+With the inverted check those two tests disagree over the whole range
+0 < free_recvbufs <= emerg_recvbufs: the guard passes because the free
+count is non-zero, the allocator refuses because the count is at or below
+the reserve, and ntpdate writes rb->recv_length through NULL.
+
+ntpdate sizes its pool with init_recvbuff(sys_numservers + 2), rounded up
+to RECV_INC, so a single-server run owns 32 buffers of which 16 were
+unusable.  input_handler() drains the socket in a loop taking one buffer
+per packet and returning none, so the 17th reply in a single drain killed
+it.  Observed in the field on three radios whose NTP server answered one
+request many times over; all three cores are identical, with
+total_recvbufs 32, free_recvbufs 16, full_recvbufs 16, emerg_recvbufs 16
+and buffer_shortfall 1, faulting on the rb->recv_length store.  Any host
+able to duplicate NTP replies could crash ntpdate this way.
+
+With the check corrected, an urgent caller may take buffers down to zero,
+which is exactly the case ntpdate's own guard already covers, so the NULL
+return becomes unreachable there.  Reserve semantics are restored for
+non-urgent callers, which is what "iron reserve for refclocks" meant.
+
+Only the inverted check is backported.  The other half of the upstream
+follow-up -- relocating the buffer_shortfall reset and adding LOG_CRIT
+diagnostics on pool exhaustion -- is left out on purpose: it adds new
+critical-severity log output, and it matters only once the pool reaches
+limit_recvbufs, which a short-lived ntpdate run does not approach.  Both
+arrive with the eventual package upgrade to 4.2.8p18.
+
+Signed-off-by: Dmitry Grinberg <dmitryg@ceragon.com>
+---
+--- a/libntp/recvbuff.c
++++ b/libntp/recvbuff.c
+@@ -234,7 +234,7 @@
+ 	recvbuf_t *buffer = NULL;
+ 
+ 	LOCK_F();
+-	if (free_recvbufs > (urgent ? emerg_recvbufs : 0)) {
++	if (free_recvbufs > (urgent ? 0 : emerg_recvbufs)) {
+ 		UNLINK_HEAD_SLIST(buffer, free_recv_list, link);
+ 	}
+ 	
