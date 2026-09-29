@@ -6,10 +6,7 @@ BR2_SVN="svn"
 BR2_PER_PACKAGE_DIRECTORIES=y
 BR2_DL_DIR="${CACHE_ROOT_DIR}/cache/80XX/buildroot-dl"
 BR2_PRIMARY_SITE="${BUILDROOT_80XX_MIRROR}"
-# BR2_PRIMARY_SITE_ONLY intentionally unset in this local POC branch only:
-# this NAS mirror (192.168.10.4) is missing at least protobuf-cpp-3.18.0,
-# so package fetches fall back to upstream _SITE where the mirror 404s.
-# Do not carry this to the real branch/PR.
+BR2_PRIMARY_SITE_ONLY=y
 BR2_CCACHE=y
 BR2_CCACHE_DIR="${CACHE_ROOT_DIR}/cache/80XX/buildroot-ccache/buildroot-2026.08-internal-gcc14"
 BR2_SSP_NONE=y
