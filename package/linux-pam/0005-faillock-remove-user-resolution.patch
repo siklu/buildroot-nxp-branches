@@ -1,3 +1,15 @@
+From: igorchornobryvtseev <124150321+igorchornobryvtseev@users.noreply.github.com>
+Date: Fri, 15 Sep 2023 16:42:34 +0300
+Subject: [PATCH] pam_faillock: skip the user-name to uid resolution
+
+RADIUS and TACACS+ users have no NSS entry, so pam_faillock's
+getpwnam() lookup fails for them and the module gives up. faillock uses
+the uid only to exempt root, and root never logs in over SSH on these
+units, so hard-code the lookup result (PORTF-1547).
+
+Upstream: N/A, Siklu-specific change
+Signed-off-by: Dima Weber <diepress@gmail.com>
+---
 --- a/modules/pam_faillock/pam_faillock.c
 +++ b/modules/pam_faillock/pam_faillock.c
 @@ -374,6 +374,22 @@

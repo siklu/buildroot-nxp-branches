@@ -1,3 +1,16 @@
+From: Alan Yaniger <alan@tkos.co.il>
+Date: Thu, 26 May 2022 16:27:17 +0300
+Subject: [PATCH] agent: pre/post hooks around handle_var_requests
+
+Add pre_call_handle_var_requests and post_call_handle_var_requests
+function pointers to snmp_agent.c, called around handle_var_requests(),
+so the Siklu SNMP plugin can run code before and after each request
+(PORTF-871).
+
+[Dima Weber: dropped the cosmetic copyright-encoding hunk]
+Upstream: N/A, Siklu-specific change
+Signed-off-by: Dima Weber <diepress@gmail.com>
+---
 --- a/agent/snmp_agent.c
 +++ b/agent/snmp_agent.c
 @@ -2995,6 +2995,10 @@

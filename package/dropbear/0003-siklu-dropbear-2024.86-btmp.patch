@@ -1,3 +1,14 @@
+From: Jonathan BEN-AVRAHAM <jonathan.ba@siklu.com>
+Date: Fri, 10 Jun 2022 10:47:48 +0300
+Subject: [PATCH] Record failed SSH logins in btmp
+
+Write a btmp entry for every failed password login, so lastb and the
+Siklu tools see failed SSH attempts.
+
+[Dima Weber: re-derived for dropbear 2026.94; updwtmpx() for the utmpx entry]
+Upstream: N/A, Siklu-specific change
+Signed-off-by: Dima Weber <diepress@gmail.com>
+---
 --- a/src/svr-auth.c
 +++ b/src/svr-auth.c
 @@ -340,6 +340,54 @@

@@ -1,3 +1,13 @@
+From: Alan Yaniger <alan@tkos.co.il>
+Date: Sun, 29 May 2022 18:38:49 +0300
+Subject: [PATCH] snmplib: make curfilename non-static
+
+The Siklu SNMP plugin reads curfilename from read_config.c, which
+net-snmp 5.9 made static.
+
+Upstream: N/A, Siklu-specific change
+Signed-off-by: Dima Weber <diepress@gmail.com>
+---
 --- netsnmp-5.9_orig/snmplib/read_config.c.origin	2022-05-29 18:30:48.190090824 +0300
 +++ netsnmp-5.9_new/snmplib/read_config.c	2022-05-29 18:32:15.668226606 +0300
 @@ -473,7 +473,7 @@

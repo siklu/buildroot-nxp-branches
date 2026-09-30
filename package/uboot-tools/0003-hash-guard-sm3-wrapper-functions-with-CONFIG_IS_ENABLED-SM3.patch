@@ -1,4 +1,4 @@
-From: Dmitry K <dmitry.k@ceragon.com>
+From: Dima Weber <diepress@gmail.com>
 Date: Mon, 14 Sep 2026 03:50:09 +0300
 Subject: [PATCH] common/hash.c: guard the SM3 wrappers with CONFIG_IS_ENABLED(SM3)
 
@@ -9,7 +9,7 @@ their registration in the hash_algo table is guarded by
 CONFIG_IS_ENABLED(SM3); guard the three definitions the same way.
 
 Upstream: Not submitted, buildroot uboot-tools packaging fix for 2026.07
-Signed-off-by: Dmitry K <dmitry.k@ceragon.com>
+Signed-off-by: Dima Weber <diepress@gmail.com>
 ---
 --- a/common/hash.c
 +++ b/common/hash.c

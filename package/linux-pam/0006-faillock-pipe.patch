@@ -1,3 +1,15 @@
+From: igorchornobryvtseev <124150321+igorchornobryvtseev@users.noreply.github.com>
+Date: Tue, 7 May 2024 18:57:23 +0300
+Subject: [PATCH] pam_faillock: report lockouts to /tmp/pam-fifo
+
+Write a message to the /tmp/pam-fifo FIFO when faillock locks or
+unlocks a user, so the Siklu configuration daemon learns about it
+(PORTF-1729).
+
+[Dima Weber: re-derived for linux-pam 1.7.2]
+Upstream: N/A, Siklu-specific change
+Signed-off-by: Dima Weber <diepress@gmail.com>
+---
 --- a/modules/pam_faillock/pam_faillock.c
 +++ b/modules/pam_faillock/pam_faillock.c
 @@ -45,6 +45,10 @@

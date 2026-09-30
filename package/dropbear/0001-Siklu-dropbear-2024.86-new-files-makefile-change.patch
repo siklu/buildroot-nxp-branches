@@ -1,3 +1,15 @@
+From: Dmitry Grinberg <dmitryg@ceragon.com>
+Date: Wed, 16 Apr 2025 13:52:39 +0300
+Subject: [PATCH] Siklu dropbear new files + makefile change
+
+Add src/siklu_dropbear.c and src/siklu_pwd.h: user lookup through the
+Siklu user database (local, RADIUS and TACACS+ users mapped to Linux
+groups), and link them into dropbear and dbclient.
+
+[Dima Weber: re-derived for dropbear 2026.94]
+Upstream: N/A, Siklu-specific change
+Signed-off-by: Dima Weber <diepress@gmail.com>
+---
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -45,7 +45,8 @@
