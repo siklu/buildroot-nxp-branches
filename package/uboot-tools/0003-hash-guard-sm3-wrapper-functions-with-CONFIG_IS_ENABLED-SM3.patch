@@ -1,0 +1,31 @@
+From: Dima Weber <diepress@gmail.com>
+Date: Mon, 14 Sep 2026 03:50:09 +0300
+Subject: [PATCH] common/hash.c: guard the SM3 wrappers with CONFIG_IS_ENABLED(SM3)
+
+hash_init_sm3(), hash_update_sm3() and hash_finish_sm3() call sm3_init(),
+sm3_update() and sm3_final() from lib/sm3.c, which tools/Makefile never
+links, so mkimage fails to link with undefined references to them. Only
+their registration in the hash_algo table is guarded by
+CONFIG_IS_ENABLED(SM3); guard the three definitions the same way.
+
+Upstream: Not submitted, buildroot uboot-tools packaging fix for 2026.07
+Signed-off-by: Dima Weber <diepress@gmail.com>
+---
+--- a/common/hash.c
++++ b/common/hash.c
+@@ -144,6 +144,7 @@
+ 	return 0;
+ }
+ 
++#if CONFIG_IS_ENABLED(SM3)
+ static int __maybe_unused hash_init_sm3(struct hash_algo *algo, void **ctxp)
+ {
+ 	struct sm3_context *ctx = malloc(sizeof(struct sm3_context));
+@@ -171,6 +172,7 @@
+ 	free(ctx);
+ 	return 0;
+ }
++#endif
+ 
+ static int __maybe_unused hash_init_crc16_ccitt(struct hash_algo *algo,
+ 						void **ctxp)

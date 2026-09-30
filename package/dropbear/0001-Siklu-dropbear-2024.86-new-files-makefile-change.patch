@@ -1,31 +1,30 @@
-From 7903732f455fd080b2a8a90a13560f2e071031a8 Mon Sep 17 00:00:00 2001
 From: Dmitry Grinberg <dmitryg@ceragon.com>
 Date: Wed, 16 Apr 2025 13:52:39 +0300
-Subject: [PATCH] Siklu dropbear-2024.86 new files + makefile change
+Subject: [PATCH] Siklu dropbear new files + makefile change
 
+Add src/siklu_dropbear.c and src/siklu_pwd.h, and link them into
+dropbear and dbclient. _getpwnam() returns the /etc/passwd entry when
+the user has one; for any other user, such as a RADIUS or TACACS+ user,
+it returns a virtual entry with uid 900, the remote-auth group, home
+/home/sw and the Siklu CLI as shell.
+
+[Dima Weber: re-derived for dropbear 2026.94]
+Upstream: N/A, Siklu-specific change
+Signed-off-by: Dima Weber <diepress@gmail.com>
 ---
- Makefile.in          |   6 +-
- src/siklu_dropbear.c | 153 +++++++++++++++++++++++++++++++++++++++++++
- src/siklu_pwd.h      |  31 +++++++++
- 3 files changed, 188 insertions(+), 2 deletions(-)
- create mode 100644 src/siklu_dropbear.c
- create mode 100644 src/siklu_pwd.h
-
-diff --git a/Makefile.in b/Makefile.in
-index 5ebfca2..0d85006 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -45,7 +45,8 @@ _COMMONOBJS=dbutil.o buffer.o dbhelpers.o \
+@@ -45,7 +45,8 @@
  		ltc_prng.o ecc.o ecdsa.o sk-ecdsa.o crypto_desc.o \
  		curve25519.o ed25519.o sk-ed25519.o \
- 		dbmalloc.o \
+ 		dbmalloc.o dbctype.o \
 -		gensignkey.o gendss.o genrsa.o gened25519.o
 +		gensignkey.o gendss.o genrsa.o gened25519.o \
 +		siklu_dropbear.o  # Added by Siklu
  COMMONOBJS = $(patsubst %,$(OBJ_DIR)/%,$(_COMMONOBJS))
  
  _SVROBJS=svr-kex.o svr-auth.o sshpty.o \
-@@ -220,7 +221,8 @@ dropbearkey: $(dropbearkeyobjs)
+@@ -222,7 +223,8 @@
  dropbearconvert: $(dropbearconvertobjs)
  
  dropbear: $(HEADERS) $(LIBTOM_DEPS) Makefile
@@ -35,10 +34,7 @@ index 5ebfca2..0d85006 100644
  
  dbclient: $(HEADERS) $(LIBTOM_DEPS) Makefile
  	$(CC) $(LDFLAGS) -o $@$(EXEEXT) $($@objs) $(LIBTOM_LIBS) $(LIBS)
-diff --git a/src/siklu_dropbear.c b/src/siklu_dropbear.c
-new file mode 100644
-index 0000000..cc4f68b
---- /dev/null
+--- a/src/siklu_dropbear.c
 +++ b/src/siklu_dropbear.c
 @@ -0,0 +1,153 @@
 +/*
@@ -194,10 +190,7 @@ index 0000000..cc4f68b
 +	}
 +	return ret;
 +}
-diff --git a/src/siklu_pwd.h b/src/siklu_pwd.h
-new file mode 100644
-index 0000000..1350da8
---- /dev/null
+--- a/src/siklu_pwd.h
 +++ b/src/siklu_pwd.h
 @@ -0,0 +1,31 @@
 +/*
@@ -231,6 +224,3 @@ index 0000000..1350da8
 +
 +
 +#endif /* SIKLU_PWD_H_ */
--- 
-2.47.1.windows.1
-

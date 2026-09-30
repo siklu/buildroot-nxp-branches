@@ -5,7 +5,7 @@
 ################################################################################
 
 LUA_RESTY_LRUCACHE_VERSION = 0.13
-LUA_RESTY_LRUCACHE_SITE = $(call github,openresty,lua-resty-lrucache,$(LUA_RESTY_LRUCACHE_VERSION))
+LUA_RESTY_LRUCACHE_SITE = $(call github,openresty,lua-resty-lrucache,v$(LUA_RESTY_LRUCACHE_VERSION))
 LUA_RESTY_LRUCACHE_SUBDIR = lua-resty-core
 LUA_RESTY_LRUCACHE_LICENSE = BSD
 LUA_RESTY_LRUCACHE_LICENSE_FILES = LICENSE

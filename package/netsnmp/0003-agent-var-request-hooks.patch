@@ -1,0 +1,47 @@
+From: Alan Yaniger <alan@tkos.co.il>
+Date: Thu, 26 May 2022 16:27:17 +0300
+Subject: [PATCH] agent: pre/post hooks around handle_var_requests
+
+Add pre_call_handle_var_requests and post_call_handle_var_requests
+function pointers to snmp_agent.c, called around handle_var_requests(),
+so the Siklu SNMP plugin can run code before and after each request
+(PORTF-871).
+
+[Dima Weber: dropped the cosmetic copyright-encoding hunk]
+Upstream: N/A, Siklu-specific change
+Signed-off-by: Dima Weber <diepress@gmail.com>
+---
+--- a/agent/snmp_agent.c
++++ b/agent/snmp_agent.c
+@@ -2995,6 +2995,10 @@
+     return asp->status;
+ }
+ 
++
++void (* pre_call_handle_var_requests)( netsnmp_agent_session *asp) = NULL;
++void (* post_call_handle_var_requests)( netsnmp_agent_session *asp) = NULL;
++
+ int
+ handle_var_requests(netsnmp_agent_session *asp)
+ {
+@@ -3005,6 +3009,9 @@
+     asp->reqinfo->asp = asp;
+     asp->reqinfo->mode = asp->mode;
+ 
++	if(pre_call_handle_var_requests != NULL)
++		pre_call_handle_var_requests(asp);
++
+     /*
+      * now, have the subtrees in the cache go search for their results 
+      */
+@@ -3080,6 +3087,10 @@
+         }
+     }
+ 
++
++	if(post_call_handle_var_requests != NULL)
++		post_call_handle_var_requests(asp);
++
+     return final_status;
+ }
+ 
