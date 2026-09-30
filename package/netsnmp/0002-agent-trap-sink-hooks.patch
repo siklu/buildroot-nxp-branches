@@ -2,10 +2,11 @@ From: Alan Yaniger <alan@tkos.co.il>
 Date: Thu, 26 May 2022 16:27:17 +0300
 Subject: [PATCH] agent: trap sink hooks for the Siklu plugin
 
-Export GetNumOfSinks(), AddMyDataToLastSink() and a myBeforeSendTrapPtr
-hook from agent_trap.c, and the matching snmpd.c changes, so the Siklu
-SNMP plugin can attach its data to trap sinks and inspect each trap
-before it is sent (PORTF-871).
+Add GetNumOfSinks(), AddMyDataToLastSink() and a myBeforeSendTrapPtr
+hook to agent_trap.c, so the Siklu SNMP plugin can attach its data to a
+trap sink and decide, per sink, whether each trap is sent. snmpd.c
+references these and the other agent functions the plugin calls, so
+the linker keeps them in the snmpd binary (PORTF-871).
 
 [Dima Weber: implicit-int extern declaration fixed for gcc 14]
 Upstream: N/A, Siklu-specific change
