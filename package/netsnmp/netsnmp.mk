@@ -43,10 +43,9 @@ NETSNMP_CONF_OPTS = \
 NETSNMP_INSTALL_STAGING_OPTS = DESTDIR=$(STAGING_DIR) LIB_LDCONFIG_CMD=true install
 NETSNMP_INSTALL_TARGET_OPTS = DESTDIR=$(TARGET_DIR) LIB_LDCONFIG_CMD=true install
 NETSNMP_CONFIG_SCRIPTS = net-snmp-config
-WITH_OUT_MIB_MODULES:="mibII/snmp_mib, mibII/system_mib, mibII/sysORTable"
-WITH_MIB_MODULES:="ucd-snmp/dlmod agentx"
-NET_SNMP_PERSISTENT_DIR:=/var
-TARGET_CFLAGS = -DNETSNMP_NO_INLINE
+NETSNMP_SIKLU_WITHOUT_MIB_MODULES := "mibII/snmp_mib, mibII/system_mib, mibII/sysORTable"
+NETSNMP_SIKLU_WITH_MIB_MODULES := "ucd-snmp/dlmod agentx"
+NETSNMP_SIKLU_PERSISTENT_DIR := /var
 
 define NETSNMP_USERS
 	snmp -1 snmp -1 * - - - snmpd user
@@ -116,16 +115,16 @@ NETSNMP_CONF_OPTS += --with-sys-location=unknown
 NETSNMP_CONF_OPTS += --with-logfile=none
 NETSNMP_CONF_OPTS += --with-perl-modules=no
 NETSNMP_CONF_OPTS += --with-default-snmp-version=2
-NETSNMP_CONF_OPTS += --with-out-mib-modules=${WITH_OUT_MIB_MODULES}
-NETSNMP_CONF_OPTS += --with-mib-modules=${WITH_MIB_MODULES}
-NETSNMP_CONF_OPTS += --with-persistent-directory=${NET_SNMP_PERSISTENT_DIR}
+NETSNMP_CONF_OPTS += --with-out-mib-modules=$(NETSNMP_SIKLU_WITHOUT_MIB_MODULES)
+NETSNMP_CONF_OPTS += --with-mib-modules=$(NETSNMP_SIKLU_WITH_MIB_MODULES)
+NETSNMP_CONF_OPTS += --with-persistent-directory=$(NETSNMP_SIKLU_PERSISTENT_DIR)
 NETSNMP_CONF_OPTS += --enable-shared
 NETSNMP_CONF_OPTS += --disable-static
 NETSNMP_CONF_OPTS += --with-enterprise-sysoid=1.3.6.1.4.1.31926
 NETSNMP_CONF_OPTS += --with-enterprise-notification-oid=1.3.6.1.4.1.31926
 NETSNMP_CONF_OPTS += --with-enterprise-oid=31926
 NETSNMP_CONF_OPTS += --with-gnu-ld
-NETSNMP_CONF_OPTS += --with-cflags=${TARGET_CFLAGS}
+NETSNMP_CONF_OPTS += --with-cflags="$(TARGET_CFLAGS) -DNETSNMP_NO_INLINE"
 endif
 
 ifneq ($(BR2_PACKAGE_NETSNMP_ENABLE_DEBUGGING),y)
