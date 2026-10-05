@@ -11,5 +11,3 @@ NGX_DEVEL_KIT_LICENSE_FILES = LICENSE
 NGX_DEVEL_KIT_DEPENDENCIES =
 
 $(eval $(generic-package))
-
-

@@ -16,4 +16,3 @@ define LUA_RESTY_WEBSOCKET_INSTALL_TARGET_CMDS
 endef
 
 $(eval $(generic-package))
-
