@@ -4,9 +4,11 @@ Subject: [PATCH] Siklu dropbear source changes
 
 Resolve users through _getpwnam()/_getpwuid() from siklu_pwd.h instead
 of getpwnam()/getpwuid(), authenticate through PAM instead of the
-password file, lower MAX_UNAUTH_CLIENTS from 30 to 10, and log PAM
-authentication and account failures at LOG_NOTICE instead of
-LOG_WARNING.
+password file, export the PAM environment into the process environment
+and keep it by not calling clearenv(), so the CLI gets what the remote
+AAA server returned, lower MAX_UNAUTH_CLIENTS from 30 to 10 and
+MAX_CHANNELS from 1000 to 10, and log PAM authentication and account
+failures at LOG_NOTICE instead of LOG_WARNING.
 
 Keep the session process root after authentication
 (DROPBEAR_SVR_DROP_PRIVS 0), as dropbear 2024.86 did: with privilege

@@ -72,7 +72,7 @@ Signed-off-by: Dima Weber <diepress@gmail.com>
  	}
  
 +	if (incrfail)
-+		write_new_btmp(getpid(), "ssh", ses.authstate.username?ses.authstate.username:"unknown", svr_ses.addrstring);
++		write_new_btmp(getpid(), "ssh", ses.authstate.pw_name?ses.authstate.pw_name:"unknown", svr_ses.addrstring);
 +
  	if (ses.authstate.failcount > svr_opts.maxauthtries) {
  		char * userstr;

@@ -2,13 +2,15 @@ From: Dmitry Grinberg <dmitryg@ceragon.com>
 Date: Wed, 16 Apr 2025 13:52:39 +0300
 Subject: [PATCH] Siklu dropbear new files + makefile change
 
-Add src/siklu_dropbear.c and src/siklu_pwd.h, and link them into
-dropbear and dbclient. _getpwnam() returns the /etc/passwd entry when
+Add src/siklu_dropbear.c and src/siklu_pwd.h to _COMMONOBJS, so every
+dropbear program links them. _getpwnam() returns the /etc/passwd entry when
 the user has one; for any other user, such as a RADIUS or TACACS+ user,
 it returns a virtual entry with uid 900, the remote-auth group, home
 /home/sw and the Siklu CLI as shell.
 
-[Dima Weber: re-derived for dropbear 2026.94]
+[Dima Weber: re-derived for dropbear 2026.94; dropped the -lz -lpam
+edit of the non-MULTI dropbear link rule, which the MULTI=1 build
+never uses]
 Upstream: N/A, Siklu-specific change
 Signed-off-by: Dima Weber <diepress@gmail.com>
 ---
@@ -24,16 +26,6 @@ Signed-off-by: Dima Weber <diepress@gmail.com>
  COMMONOBJS = $(patsubst %,$(OBJ_DIR)/%,$(_COMMONOBJS))
  
  _SVROBJS=svr-kex.o svr-auth.o sshpty.o \
-@@ -222,7 +223,8 @@
- dropbearconvert: $(dropbearconvertobjs)
- 
- dropbear: $(HEADERS) $(LIBTOM_DEPS) Makefile
--	$(CC) $(LDFLAGS) -o $@$(EXEEXT) $($@objs) $(LIBTOM_LIBS) $(LIBS) @CRYPTLIB@ $(PLUGIN_LIBS)
-+	# Added -lz -lpam for zlib and PAM support (Siklu customization)
-+	$(CC) $(LDFLAGS) -o $@$(EXEEXT) $($@objs) $(LIBTOM_LIBS) $(LIBS) -lz -lpam @CRYPTLIB@ $(PLUGIN_LIBS)
- 
- dbclient: $(HEADERS) $(LIBTOM_DEPS) Makefile
- 	$(CC) $(LDFLAGS) -o $@$(EXEEXT) $($@objs) $(LIBTOM_LIBS) $(LIBS)
 --- a/src/siklu_dropbear.c
 +++ b/src/siklu_dropbear.c
 @@ -0,0 +1,153 @@
