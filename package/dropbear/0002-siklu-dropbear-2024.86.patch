@@ -8,7 +8,16 @@ password file, lower MAX_UNAUTH_CLIENTS from 30 to 10, and log PAM
 authentication and account failures at LOG_NOTICE instead of
 LOG_WARNING.
 
-[Dima Weber: re-derived for dropbear 2026.94]
+Keep the session process root after authentication
+(DROPBEAR_SVR_DROP_PRIVS 0), as dropbear 2024.86 did: with privilege
+dropping the session writes utmp, wtmp and lastlog through a utmp group,
+which the rootfs does not have, so a remote AAA user's (uid 900)
+successful login would miss wtmp, where the configuration daemon reads
+it. Stream (unix socket) forwarding requires privilege dropping, so it
+is off.
+
+[Dima Weber: re-derived for dropbear 2026.94; DROP_PRIVS and stream
+forwarding off]
 Upstream: N/A, Siklu-specific change
 Signed-off-by: Dima Weber <diepress@gmail.com>
 ---
@@ -58,7 +67,19 @@ Signed-off-by: Dima Weber <diepress@gmail.com>
  		}
 --- a/src/default_options.h
 +++ b/src/default_options.h
-@@ -239,16 +239,18 @@
+@@ -73,8 +73,9 @@
+ 
+ #define DROPBEAR_SVR_LOCALTCPFWD 1
+ #define DROPBEAR_SVR_REMOTETCPFWD 1
+-#define DROPBEAR_SVR_LOCALSTREAMFWD 1
+-#define DROPBEAR_SVR_REMOTESTREAMFWD 1
++/* Siklu - changed to '0': stream forwarding requires DROPBEAR_SVR_DROP_PRIVS */
++#define DROPBEAR_SVR_LOCALSTREAMFWD 0
++#define DROPBEAR_SVR_REMOTESTREAMFWD 0
+ 
+ /* Enable Authentication Agent Forwarding */
+ #define DROPBEAR_SVR_AGENTFWD 1
+@@ -239,16 +240,18 @@
  #define MOTD_MAXSIZE 2000
  
  /* Authentication Types - at least one required.
@@ -81,7 +102,7 @@ Signed-off-by: Dima Weber <diepress@gmail.com>
  
  /* ~/.ssh/authorized_keys authentication.
   * You must define DROPBEAR_SVR_PUBKEY_AUTH in order to use plugins. */
-@@ -303,7 +305,7 @@
+@@ -303,7 +306,7 @@
  
  /* And then a global limit to avoid chewing memory if connections
   * come from many IPs */
@@ -90,6 +111,17 @@ Signed-off-by: Dima Weber <diepress@gmail.com>
  
  /* Default maximum number of failed authentication tries (server option) */
  /* -T server option overrides */
+@@ -330,7 +333,9 @@
+ /* Change server process to user privileges after authentication. */
+ #ifndef DROPBEAR_SVR_DROP_PRIVS
+ /* Default is enabled. Should only be disabled if platforms are incompatible */
+-#define DROPBEAR_SVR_DROP_PRIVS DROPBEAR_SVR_MULTIUSER
++/* Siklu - changed to '0': the session writes utmp/wtmp/lastlog as root,
++   as dropbear 2024.86 did; the rootfs has no utmp group */
++#define DROPBEAR_SVR_DROP_PRIVS 0
+ #endif
+ 
+ /* Delay introduced before closing an unauthenticated session (seconds).
 --- a/src/dropbearkey.c
 +++ b/src/dropbearkey.c
 @@ -408,7 +408,7 @@
