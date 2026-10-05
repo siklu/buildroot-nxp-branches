@@ -46,6 +46,7 @@ NETSNMP_CONFIG_SCRIPTS = net-snmp-config
 NETSNMP_SIKLU_WITHOUT_MIB_MODULES := "mibII/snmp_mib, mibII/system_mib, mibII/sysORTable"
 NETSNMP_SIKLU_WITH_MIB_MODULES := "ucd-snmp/dlmod agentx"
 NETSNMP_SIKLU_PERSISTENT_DIR := /var
+NETSNMP_SIKLU_CFLAGS = $(TARGET_CFLAGS) -DNETSNMP_NO_INLINE
 
 define NETSNMP_USERS
 	snmp -1 snmp -1 * - - - snmpd user
@@ -124,8 +125,9 @@ NETSNMP_CONF_OPTS += --with-enterprise-sysoid=1.3.6.1.4.1.31926
 NETSNMP_CONF_OPTS += --with-enterprise-notification-oid=1.3.6.1.4.1.31926
 NETSNMP_CONF_OPTS += --with-enterprise-oid=31926
 NETSNMP_CONF_OPTS += --with-gnu-ld
-NETSNMP_CONF_OPTS += --with-cflags="$(TARGET_CFLAGS) -DNETSNMP_NO_INLINE"
 endif
+
+NETSNMP_CONF_OPTS += --with-cflags="$(NETSNMP_SIKLU_CFLAGS)"
 
 ifneq ($(BR2_PACKAGE_NETSNMP_ENABLE_DEBUGGING),y)
 NETSNMP_CONF_OPTS += --disable-debugging
