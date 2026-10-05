@@ -6,7 +6,9 @@ Add GetNumOfSinks(), AddMyDataToLastSink() and a myBeforeSendTrapPtr
 hook to agent_trap.c, so the Siklu SNMP plugin can attach its data to a
 trap sink and decide, per sink, whether each trap is sent. snmpd.c
 references these and the other agent functions the plugin calls, so
-the linker keeps them in the snmpd binary (PORTF-871).
+the linker keeps them in the snmpd binary. netsnmp_send_traps() also
+replaces the enterprise OID of every SNMPv1 trap with myEnterpriseOid
+(PORTF-871).
 
 [Dima Weber: implicit-int extern declaration fixed for gcc 14]
 Upstream: N/A, Siklu-specific change
