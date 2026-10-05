@@ -7,7 +7,14 @@ message, with the minutes left when known, to the /tmp/pam-fifo FIFO,
 so the Siklu configuration daemon learns about the lockout (PORTF-1729).
 Only lockouts are reported; unlocking writes nothing.
 
-[Dima Weber: re-derived for linux-pam 1.7.2]
+The FIFO is opened non-blocking, so with no reader (the daemon gone)
+the login goes on and the lockout is logged as not reported. Control
+characters in the message, which could only come from the user name,
+are replaced with '?' since the reader splits it into lines, and an
+over-long message is cut to the buffer with its newline kept.
+
+[Dima Weber: re-derived for linux-pam 1.7.2; non-blocking open, %m
+instead of the GNU strerror_r(), user name sanitized, length clamped]
 Upstream: N/A, Siklu-specific change
 Signed-off-by: Dima Weber <diepress@gmail.com>
 ---
@@ -36,7 +43,7 @@ Signed-off-by: Dima Weber <diepress@gmail.com>
  static int
  args_parse(pam_handle_t *pamh, int argc, const char **argv,
  		int flags, struct options *opts)
-@@ -458,6 +467,47 @@
+@@ -458,6 +467,61 @@
  				pam_info(pamh, _("(%d minutes left to unlock)"), (int)left);
  #endif
  		}
@@ -44,17 +51,22 @@ Signed-off-by: Dima Weber <diepress@gmail.com>
 +		/* Siklu addition */
 +		int fd;
 +		int len;
++		int i;
 +		int res;
 +		char buf[PAM_FIFO_MSG_MAXSIZE + 1];
 +
 +		buf[PAM_FIFO_MSG_MAXSIZE] = 0;
 +
-+        do {
-+			fd = open(PAM_FIFO, O_WRONLY, 0200);
-+        } while ( fd < 0 && errno == EINTR );
++		/* O_NONBLOCK: with no reader on the FIFO, open() fails with ENXIO
++		 * instead of blocking the login. */
++		do {
++			fd = open(PAM_FIFO, O_WRONLY | O_NONBLOCK);
++		} while ( fd < 0 && errno == EINTR );
 +		if (fd == -1) {
-+			strerror_r(errno, buf, PAM_FIFO_MSG_MAXSIZE);
-+			pam_syslog(pamh, LOG_ERR, "Error opening fifo %s (%s)", PAM_FIFO, buf);
++			if (errno == ENXIO)
++				pam_syslog(pamh, LOG_WARNING, "No reader on fifo %s, lockout not reported", PAM_FIFO);
++			else
++				pam_syslog(pamh, LOG_ERR, "Error opening fifo %s: %m", PAM_FIFO);
 +			return;
 +		}
 +
@@ -70,13 +82,22 @@ Signed-off-by: Dima Weber <diepress@gmail.com>
 +			close(fd);
 +			return;
 +		}
++		if (len >= PAM_FIFO_MSG_MAXSIZE) {
++			len = PAM_FIFO_MSG_MAXSIZE - 1;
++			buf[len - 1] = '\n';
++		}
++		/* The reader splits the message into lines, so a control character
++		 * in the user name must not reach it. */
++		for (i = 0; i < len - 1; ++i) {
++			if ((unsigned char)buf[i] < 0x20 || buf[i] == 0x7f)
++				buf[i] = '?';
++		}
 +
 +		do {
 +			res = write(fd, buf, len);
 +		} while ( res < 0 && errno == EINTR );
 +		if ( res < 0 ) {
-+			strerror_r(errno, buf, PAM_FIFO_MSG_MAXSIZE);
-+			pam_syslog(pamh, LOG_ERR, "Error writing to fifo %s (%s)", PAM_FIFO, buf);
++			pam_syslog(pamh, LOG_ERR, "Error writing to fifo %s: %m", PAM_FIFO);
 +		}
 +
 +		close(fd);
