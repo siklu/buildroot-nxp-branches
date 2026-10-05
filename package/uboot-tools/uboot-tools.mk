@@ -33,9 +33,7 @@ define UBOOT_TOOLS_CONFIGURE_CMDS
 	mkdir -p $(@D)/include/generated
 	$(if $(BR2_PACKAGE_UBOOT_TOOLS_FIT_SUPPORT),$(UBOOT_TOOLS_ENABLE_HASH_ALGOS))
 	$(if $(BR2_PACKAGE_UBOOT_TOOLS_FIT_SUPPORT),echo '#define CONFIG_TOOLS_FIT_PRINT 1' >> $(@D)/include/generated/autoconf.h)
-	echo '#define CONFIG_TOOLS_FIT_SIGNATURE 1' >> $(@D)/include/generated/autoconf.h
-	echo '#define CONFIG_TOOLS_FIT_SIGNATURE_MAX_SIZE 0x10000000' >> $(@D)/include/generated/autoconf.h
-	echo '#define CONFIG_TOOLS_RSASSA_PSS 1' >> $(@D)/include/generated/autoconf.h
+	echo $(if $(BR2_PACKAGE_UBOOT_TOOLS_FIT_SIGNATURE_SUPPORT),'#define CONFIG_FIT_SIGNATURE 1') >> $(@D)/include/generated/autoconf.h
 	mkdir -p $(@D)/include/asm
 	touch $(@D)/include/asm/linkage.h
 endef
@@ -44,32 +42,16 @@ UBOOT_TOOLS_MAKE_OPTS = CROSS_COMPILE="$(TARGET_CROSS)" \
 	CFLAGS="$(TARGET_CFLAGS)" \
 	LDFLAGS="$(TARGET_LDFLAGS)" \
 	HOSTCFLAGS="$(HOST_CFLAGS)" \
-	STRIP=$(TARGET_STRIP) \
-	CONFIG_TOOLS_LIBCRYPTO=y \
-	CONFIG_FIT_SIGNATURE=y CONFIG_FIT_SIGNATURE_MAX_SIZE=0x10000000
-
-# tools/Makefile's FIT_OBJS-y (image-host.o, always built regardless of
-# FIT_SUPPORT/FIT_SIGNATURE_SUPPORT) calls image_get_checksum_algo() and
-# friends unconditionally; those are only defined when CONFIG_TOOLS_LIBCRYPTO
-# selects FIT_SIG_OBJS-y (image-sig-host.o). an upstream gap, not a Siklu one: without
-# this, a plain "just mkimage" build (BR2_PACKAGE_UBOOT_TOOLS_MKIMAGE=y, no
-# FIT support requested at all) fails to link with undefined references to
-# image_get_checksum_algo/image_get_crypto_algo/etc. openssl is already
-# selected on this target via BR2_PACKAGE_LIBOPENSSL_BIN.
-#
-# CONFIG_FIT_SIGNATURE has to travel with CONFIG_TOOLS_LIBCRYPTO here too:
-# include/image.h only compiles struct checksum_algo's calculate_sign member
-# in when IMAGE_ENABLE_SIGN (USE_HOSTCC && CONFIG_IS_ENABLED(FIT_SIGNATURE))
-# is true, but tools/image-sig-host.c initializes that member unconditionally
-# whenever it's compiled at all (i.e. whenever CONFIG_TOOLS_LIBCRYPTO selects
-# it) - u-boot's own Kconfig always pairs the two (TOOLS_FIT_SIGNATURE
-# `depends on TOOLS_LIBCRYPTO`, both `def_bool y`); it never anticipated
-# buildroot's config generation being able to decouple them.
-UBOOT_TOOLS_DEPENDENCIES += openssl host-pkgconf
+	STRIP=$(TARGET_STRIP)
 
 ifeq ($(BR2_PACKAGE_UBOOT_TOOLS_FIT_SUPPORT),y)
 UBOOT_TOOLS_MAKE_OPTS += CONFIG_FIT=y CONFIG_MKIMAGE_DTC_PATH=dtc
 UBOOT_TOOLS_DEPENDENCIES += dtc
+endif
+
+ifeq ($(BR2_PACKAGE_UBOOT_TOOLS_FIT_SIGNATURE_SUPPORT),y)
+UBOOT_TOOLS_MAKE_OPTS += CONFIG_FIT_SIGNATURE=y CONFIG_FIT_SIGNATURE_MAX_SIZE=0x10000000
+UBOOT_TOOLS_DEPENDENCIES += openssl host-pkgconf
 endif
 
 ifeq ($(BR2_PACKAGE_UBOOT_TOOLS_MKEFICAPSULE),y)

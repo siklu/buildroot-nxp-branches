@@ -1,13 +1,7 @@
 config BR2_PACKAGE_UBOOT_TOOLS
 	bool "u-boot tools"
-	select BR2_PACKAGE_OPENSSL # tools/image-sig-host.o, always linked
 	help
 	  Companion tools for Das U-Boot bootloader.
-
-	  u-boot 2026.07's tools/image-host.o calls the FIT signature
-	  code unconditionally, so every build links libcrypto and
-	  compiles FIT signature support in, whatever FIT options are
-	  selected below.
 
 	  http://www.denx.de/wiki/U-Boot/WebHome
 
@@ -49,9 +43,9 @@ config BR2_PACKAGE_UBOOT_TOOLS_FIT_SIGNATURE_SUPPORT
 	  public key is stored in a non-volatile place, any image can
 	  be verified in this way.
 
-	  The libssl/libcrypto dependency, and the possible GPL/OpenSSL
-	  licensing incompatibility it brings, comes with
-	  BR2_PACKAGE_UBOOT_TOOLS itself.
+	  Enabling this option pulls in a dependency on libssl and
+	  libcrypto, and possibly GPL/OpenSSL licensing
+	  incompatibility issues.
 
 config BR2_PACKAGE_UBOOT_TOOLS_FIT_CHECK_SIGN
 	bool "fit_check_sign"
