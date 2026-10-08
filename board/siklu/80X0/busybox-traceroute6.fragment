@@ -1,0 +1,5 @@
+# traceroute6 for the Web UI's IPv6 traceroute (portfolio:
+# webapi/httpHandler_start-tracert.h, httpHandler_StartTracert6, which runs
+# /usr/bin/traceroute6). iputils built it up to 20210722; from 20250605 on
+# busybox provides it, installed as /usr/bin/traceroute6.
+CONFIG_TRACEROUTE6=y

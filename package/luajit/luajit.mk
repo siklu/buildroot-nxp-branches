@@ -4,8 +4,8 @@
 #
 ################################################################################
 
-LUAJIT_VERSION = 2.1-20231006
-LUAJIT_SITE = $(call github,openresty,luajit2,$(LUAJIT_VERSION))
+LUAJIT_VERSION = 2.1-20260415
+LUAJIT_SITE = $(call github,openresty,luajit2,v$(LUAJIT_VERSION))
 LUAJIT_LICENSE = MIT
 LUAJIT_LICENSE_FILES = COPYRIGHT
 LUAJIT_CPE_ID_VENDOR = luajit

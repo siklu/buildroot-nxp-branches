@@ -26,9 +26,12 @@ then
 	exit 1
 fi
 
-# This path for the cross compiler is the Siklu standard
-export CROSS_COMPILE=/opt/arm/gcc-arm-10.2-2020.11-x86_64-arm-none-linux-gnueabihf/bin/arm-none-linux-gnueabihf-
-export PATH=/opt/arm/gcc-arm-10.2-2020.11-x86_64-arm-none-linux-gnueabihf/bin/:${PATH}
+# Buildroot builds its own gcc (BR2_TOOLCHAIN_BUILDROOT_GLIBC); no external
+# cross compiler is needed. Every source, the toolchain's kernel headers
+# included, downloads from BUILDROOT_80XX_MIRROR (BR2_PRIMARY_SITE_ONLY), so
+# export it as setupNxp in the portfolio repo does. The portfolio build also
+# sets LINUX_HEADERS_OVERRIDE_SRCDIR to its kernel tree; a standalone build
+# without it needs the linux-headers tarball on the mirror.
 
 # Temporarily comment out whatever you don't need.
 #make oldconfig
@@ -36,4 +39,4 @@ make siklu_80X0_defconfig
 #make menuconfig
 #make savedefconfig
 make clean
-make ARCH=arm CROSS_COMPILE=${CROSS_COMPILE}
+make
