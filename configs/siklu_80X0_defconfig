@@ -1,3 +1,4 @@
+#test now
 BR2_arm=y
 BR2_cortex_a7=y
 BR2_ARM_FPU_VFPV4=y
