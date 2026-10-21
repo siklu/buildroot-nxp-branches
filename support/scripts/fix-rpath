@@ -62,6 +62,7 @@ TARGET_EXCLUDEPATHS="/lib/firmware"
 
 declare -a sanitize_extra_args
 rootdir=
+remove_empty_rpath=
 
 patch_file() {
     local file="${1}"
@@ -89,6 +90,15 @@ patch_file() {
 
     # call patchelf to sanitize the rpath
     "${PATCHELF}" --make-rpath-relative "${rootdir}" "${sanitize_extra_args[@]}" "${file}"
+
+    # An empty RUNPATH left by the sanitization still disables the
+    # DT_RPATH of the executable for this library's dependencies, so
+    # drop a tag that ended up empty.
+    if test -n "${remove_empty_rpath}" && \
+       test -z "$("${PATCHELF}" --print-rpath "${file}" 2>/dev/null)" ; then
+        "${PATCHELF}" --remove-rpath "${file}"
+    fi
+
     # restore the original permission
     test "${changed}" != "" && chmod u-w "${file}"
 }
@@ -150,6 +160,10 @@ main() {
 
             # should be like for the target tree below
             sanitize_extra_args+=( "--no-standard-lib-dirs" )
+
+            # the sysroot is linked against from outside, with an
+            # rpath of its own: an empty tag must not mask it.
+            remove_empty_rpath=y
             ;;
 
         target)
