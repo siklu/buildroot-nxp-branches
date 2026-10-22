@@ -1,0 +1,29 @@
+config BR2_PACKAGE_HOST_CLANG
+	bool "host clang"
+	depends on BR2_PACKAGE_LLVM_ARCH_SUPPORTS # llvm
+	depends on BR2_HOST_GCC_AT_LEAST_7 # host-llvm
+	select BR2_HOST_CMAKE_AT_LEAST_3_20 # cmake required version at least 3.20
+	help
+	  Clang is a C/C++, Objective C/C++ and OpenCL C front-end
+	  for the LLVM compiler. The host build installs clang and
+	  its tools, clang-format among them, into the host
+	  directory.
+
+	  http://clang.llvm.org
+
+if BR2_PACKAGE_HOST_CLANG
+
+config BR2_PACKAGE_HOST_CLANG_TOOLS_EXTRA
+	bool "clang-tools-extra"
+	help
+	  Build the clang-tools-extra tools of the LLVM project
+	  (clang-tidy, clang-include-fixer, ...) together with
+	  host clang. clangd is not built.
+
+	  https://clang.llvm.org/extra/
+
+endif
+
+comment "host clang needs host gcc >= 7"
+	depends on BR2_PACKAGE_LLVM_ARCH_SUPPORTS
+	depends on !BR2_HOST_GCC_AT_LEAST_7
