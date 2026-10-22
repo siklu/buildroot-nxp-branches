@@ -24,6 +24,8 @@ config BR2_PACKAGE_HOST_CLANG_TOOLS_EXTRA
 
 config BR2_PACKAGE_HOST_CLANG_TOOLS_ONLY
 	bool "host clang tools only"
+	# the per-package host directories keep the removed files
+	depends on BR2_PER_PACKAGE_DIRECTORIES
 	# packages that build against host clang or host llvm
 	depends on !BR2_PACKAGE_LLVM
 	depends on !BR2_PACKAGE_CLANG
@@ -43,7 +45,14 @@ config BR2_PACKAGE_HOST_CLANG_TOOLS_ONLY
 	  A package that builds against host clang or host llvm
 	  (compiler-rt, libclc, mesa3d, qt5tools qdoc, lld, ...)
 	  needs them; such a package hides this option, and a new
-	  one needs to be added to its dependencies.
+	  one needs to be added to this option's "depends on" list.
+
+	  Needs per-package directories: the files are removed only
+	  from the merged host directory, while each package's own
+	  host directory keeps them, so a later rebuild of host
+	  clang or of a package using it still finds them. Without
+	  per-package directories they would be gone from the only
+	  host directory until a clean build.
 
 endif
 
