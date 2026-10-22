@@ -22,6 +22,29 @@ config BR2_PACKAGE_HOST_CLANG_TOOLS_EXTRA
 
 	  https://clang.llvm.org/extra/
 
+config BR2_PACKAGE_HOST_CLANG_TOOLS_ONLY
+	bool "host clang tools only"
+	# packages that build against host clang or host llvm
+	depends on !BR2_PACKAGE_LLVM
+	depends on !BR2_PACKAGE_CLANG
+	depends on !BR2_PACKAGE_COMPILER_RT
+	depends on !BR2_PACKAGE_LIBCLC
+	depends on !BR2_PACKAGE_SPIRV_LLVM_TRANSLATOR
+	depends on !BR2_PACKAGE_MESA3D_LLVM
+	depends on !BR2_PACKAGE_QT5TOOLS_QDOC_TOOL
+	depends on !BR2_PACKAGE_HOST_LLD
+	help
+	  Keep only the clang and LLVM tools and their shared
+	  libraries in the host directory (and so in the SDK): the
+	  static libraries of host-llvm and host-clang, their CMake
+	  package files and llvm-config are removed when the host
+	  directory is finalized.
+
+	  A package that builds against host clang or host llvm
+	  (compiler-rt, libclc, mesa3d, qt5tools qdoc, lld, ...)
+	  needs them; such a package hides this option, and a new
+	  one needs to be added to its dependencies.
+
 endif
 
 comment "host clang needs host gcc >= 7"

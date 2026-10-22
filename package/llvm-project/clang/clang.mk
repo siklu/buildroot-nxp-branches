@@ -82,6 +82,23 @@ HOST_CLANG_CONF_OPTS += \
 	-DCLANG_ENABLE_CLANGD=OFF
 endif
 
+# Only the tools are wanted from host clang: the static archives that
+# host-llvm and host-clang install, and the CMake package files and
+# llvm-config that point at them, leave the final host directory.
+# This runs at host-finalize, after every package is built, because
+# the per-package host directories are merged there.
+ifeq ($(BR2_PACKAGE_HOST_CLANG_TOOLS_ONLY),y)
+define HOST_CLANG_DROP_DEVELOPMENT_FILES
+	sed -n 's@^[^,]*,\./\(.*\.a\)$$@\1@p' \
+		$(HOST_LLVM_DIR)/.files-list-host.txt \
+		$(HOST_CLANG_DIR)/.files-list-host.txt \
+		| (cd $(HOST_DIR) && xargs -r rm -f)
+	rm -rf $(HOST_DIR)/lib/cmake/llvm $(HOST_DIR)/lib/cmake/clang \
+		$(HOST_DIR)/bin/llvm-config
+endef
+HOST_FINALIZE_HOOKS += HOST_CLANG_DROP_DEVELOPMENT_FILES
+endif
+
 # Clang can't be used as compiler on the target since there are no
 # development files (headers) and other build tools. So remove clang
 # binaries and some other unnecessary files from target.
