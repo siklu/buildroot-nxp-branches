@@ -741,6 +741,7 @@ STAGING_DIR_FILES_LISTS = $(sort $(wildcard $(BUILD_DIR)/*/.files-list-staging.t
 host-finalize: $(PACKAGES) $(HOST_DIR) $(HOST_DIR_SYMLINK)
 	@$(call MESSAGE,"Finalizing host directory")
 	$(call per-package-rsync,$(sort $(PACKAGES)),host,$(HOST_DIR),copy)
+	$(foreach hook,$(HOST_FINALIZE_HOOKS),$($(hook))$(sep))
 	$(Q)PARALLEL_JOBS=$(PARALLEL_JOBS) \
 		PER_PACKAGE_DIR=$(PER_PACKAGE_DIR) \
 		$(TOPDIR)/support/scripts/fix-rpath host

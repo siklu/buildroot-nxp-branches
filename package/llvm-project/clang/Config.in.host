@@ -1,0 +1,61 @@
+config BR2_PACKAGE_HOST_CLANG
+	bool "host clang"
+	depends on BR2_PACKAGE_LLVM_ARCH_SUPPORTS # llvm
+	depends on BR2_HOST_GCC_AT_LEAST_7 # host-llvm
+	select BR2_HOST_CMAKE_AT_LEAST_3_20 # cmake required version at least 3.20
+	help
+	  Clang is a C/C++, Objective C/C++ and OpenCL C front-end
+	  for the LLVM compiler. The host build installs clang and
+	  its tools, clang-format among them, into the host
+	  directory.
+
+	  http://clang.llvm.org
+
+if BR2_PACKAGE_HOST_CLANG
+
+config BR2_PACKAGE_HOST_CLANG_TOOLS_EXTRA
+	bool "clang-tools-extra"
+	help
+	  Build the clang-tools-extra tools of the LLVM project
+	  (clang-tidy, clang-include-fixer, ...) together with
+	  host clang. clangd is not built.
+
+	  https://clang.llvm.org/extra/
+
+config BR2_PACKAGE_HOST_CLANG_TOOLS_ONLY
+	bool "host clang tools only"
+	# the per-package host directories keep the removed files
+	depends on BR2_PER_PACKAGE_DIRECTORIES
+	# packages that build against host clang or host llvm
+	depends on !BR2_PACKAGE_LLVM
+	depends on !BR2_PACKAGE_CLANG
+	depends on !BR2_PACKAGE_COMPILER_RT
+	depends on !BR2_PACKAGE_LIBCLC
+	depends on !BR2_PACKAGE_SPIRV_LLVM_TRANSLATOR
+	depends on !BR2_PACKAGE_MESA3D_LLVM
+	depends on !BR2_PACKAGE_QT5TOOLS_QDOC_TOOL
+	depends on !BR2_PACKAGE_HOST_LLD
+	help
+	  Keep only the clang and LLVM tools and their shared
+	  libraries in the host directory (and so in the SDK): the
+	  static libraries of host-llvm and host-clang, their CMake
+	  package files and llvm-config are removed when the host
+	  directory is finalized.
+
+	  A package that builds against host clang or host llvm
+	  (compiler-rt, libclc, mesa3d, qt5tools qdoc, lld, ...)
+	  needs them; such a package hides this option, and a new
+	  one needs to be added to this option's "depends on" list.
+
+	  Needs per-package directories: the files are removed only
+	  from the merged host directory, while each package's own
+	  host directory keeps them, so a later rebuild of host
+	  clang or of a package using it still finds them. Without
+	  per-package directories they would be gone from the only
+	  host directory until a clean build.
+
+endif
+
+comment "host clang needs host gcc >= 7"
+	depends on BR2_PACKAGE_LLVM_ARCH_SUPPORTS
+	depends on !BR2_HOST_GCC_AT_LEAST_7
